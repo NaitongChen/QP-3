@@ -1,0 +1,6 @@
+\section{Problem Definition}\label{sec:problem_def}
+Given a dataset $(X_i)_{i=1}^n \distiid \pi_\theta$, with $\pi_\theta$ being a distribution from the exponential family whose parameter $\theta$ is of interest. We decompose each $X_i$ to $f(X_i)$ and $g(X_i)$ such that both parts contain information about $\theta$, and there exists some function $h$ such that $X_i = h(f(X_i), g(X_i))$ satisfying either of the two properties:
+\begin{itemize}
+\item (P1): $f(X_i)$ and $g(X_i)$ are independent with known distributions (up to unknown $\theta$);
+\item (P2): $f(X_i)$ has a known marginal distribution and $g(X_i)$ has a known conditional distribution given $f(X_i)$ (up to unknown $\theta$).
+\end{itemize}

@@ -1,0 +1,39 @@
+\section{Paper-specific project}
+I noticed that most of the experiments and simulation studies in the paper only cover cases where the distributions of $f(X)$ and $g(X)\given f(X)$ are in the same family as the original data $X$ (i.e. Gaussians or Poissons with different parameters), and there is minimal discussion on when this is not the case. I would like to therefore focus my paper-specific project on an instance of data fission where $f(X)$ follows a distribution that is not in the same family as $X$ or $g(X)\given f(X)$.\\
+
+The particular case that I would like to focus on is to \textbf{construct selective CIs in the fixed-design GLM model} where $Y_i \distiid \distExp(\exp(\theta_i)$ where $\theta_i=\beta^\top x_i)$ (listed under Appendix B of \cite{leiner2022data}).
+
+\begin{itemize}
+\item For each $Y_i$ with $i\in\{1,\dots,n\}$, draw $Z_i=(Z_{i1}, \dots, Z_{iB})$ where each element is \iid $Z_{ib} \distas \distPoiss(Y_i)$ with $b\in\{1,\cdots,B\}$.\\
+Then $f(Y_i) = Z_i$, where each element is \iid $\distGeom\left(\frac{\theta_i}{\theta_i+B}\right)$,\\
+$g(Y_i) \given f(Y_i)$ has conditional distribution $\distGam(1+\sum_{b=1}^B [f(Y_i)]_b, \theta_i + B)$.
+
+\item For each $Y_i$, draw $Z_i \distas \distPoiss(\tau Y_i)$ with $\tau\in(0,\infty)$.\\
+Then $f(Y_i) = Z$, where each element is \iid $\distGeom\left(\frac{\theta_i}{\theta_i+\tau}\right)$,\\
+$g(Y_i) \given f(Y_i)$ has conditional distribution $\distGam(1+f(Y_i), \theta_i + \tau)$.
+\end{itemize}
+
+\textbf{The proposed procesure is}
+
+\begin{itemize}
+\item Decompose each $y_i$ using one of the two above procedures (assuming we are going with the first one)
+
+\item fit $f(y_i)$ by maximizing
+\[
+\sum_{i=1}^n\sum_{b=1}^B \log \distGeom\left(z_{ib} \given \frac{\beta^\top x_i}{\beta^\top x_i+B}\right) + \lambda \|\beta\|_1
+\]
+
+(I've verified that this function is convex in $\beta$.)
+
+\item Fit a Gamma GLM model using just the selected features from the previous step
+
+\item Since $\distGam$ is in the exponential dispersion family, we can follow the exact same setup as in Appendix A.5 of \cite{leiner2022data} to use the QMLE procedure to construct CIs in the inference step.
+
+\end{itemize}
+
+\textbf{Key areas that I would like to explore (through simulations)}
+\begin{itemize}
+\item compare the variables selected using decomposed data following geometric distribution against those using data splitting and the (invalid) approach of using the same dataset twice for both selection and inference. The setup that I have is mostly inline with the simulation studies in Sections 4 and 5 in \cite{leiner2022data}, however, I would like to ensure there is no influential point and all assumptions are met. This way we can better isolate the effect of transforming the original dataset to something that follows a different distribution.
+\item compare the two data fission procedures laid out above with discrete and continous tuning parameters ($B$ and $\tau$) for deciding how much information is split between $f(Y)$ and $g(Y)\given f(Y)$. The second version seems like a continuous relaxation (under expectation) of the first data fission method. However, in the case with a discrete tuning parameter, the dimension of $f(Y_i)$ changes and we need to somehow account for that in the selection step. This is not addressed directly in the paper, but I think a natural way to deal with this is to think of stacking the elements of $f(Y_i)$ so that for each particular set of covariates $x_i$, we have multiple corresponding responses instead of $1$. I would like to explore the connection between these two fission processes (probably empirically) in terms of the amount of information allocated in each component of the fissioned data. The same simulation setup from the previous bullet point can be used here.
+\item check the robustness of this procedure with respect to distributional assumptions. Maybe instead of generating data actually from an exponential distribution, we can generate data using one of a different shape, for example, the log normal distribution.
+\end{itemize}
