@@ -1,6 +1,28 @@
 \section{Proofs}
 \bexa
-Data fission can be viewed as a continuous version of data splitting.
+Data fission can be viewed as a continuous analog of data splitting in terms of the allocation of Fisher information.
+\newline $ $
+Let $\{X_i\}_{i=1}^n$ be \iid $\distNorm(\theta, \sigma^2)$. Let $X \defas \begin{bmatrix} X_1, \dots, X_n \end{bmatrix}^\top$. Recall that data splitting defines $f(X)$ and $g(X)$ as
+\[
+f^{\text{split}}(X) = \begin{bmatrix} X_1, \dots, X_{an} \end{bmatrix},\quad
+g^{\text{split}}(X) = \begin{bmatrix} X_{an+1}, \dots, X_{n} \end{bmatrix},
+\]
+Note that
+\[
+\mcI_{f^{\text{split}}(X)} = an\frac{1}{\sigma^2},\quad
+\mcI_{g^{\text{split}}(X)} = (1-a)n\frac{1}{\sigma^2}.
+\]
+On the other hand, data fission first simulates $\{Z_i\}_{i=1}^n$ distributed as \iid $\distNorm(0, \sigma^2)$ and have, for some fixed $\tau\in(0,\infty)$,
+\[
+f^{\text{fisson}}(X) = \begin{bmatrix} X_1 + \tau Z_1, \dots, X_n + \tau Z_n \end{bmatrix},\quad
+g^{\text{fisson}}(X) = \begin{bmatrix} X_1 - \frac{1}{\tau}Z_1, \dots, X_n - \frac{1}{\tau}Z_n \end{bmatrix}.
+\]
+Note that for all $i\in\{1,\dots,n\}$, $X_i + \tau Z_i \distas \distNorm\left(\theta, (1+\tau^2)\sigma^2 \right)$, $X_i - \frac{1}{\tau} Z_i \distas \distNorm\left(\theta, (1+\frac{1}{\tau^2})\sigma^2 \right)$. We then have
+\[
+\mcI_{f^{\text{fisson}}(X)} = n\frac{1}{(1+\tau^2)\sigma^2},\quad
+\mcI_{g^{\text{fisson}}(X)} = n\frac{1}{(1+\frac{1}{\tau^2})\sigma^2}.
+\]
+By setting $a = \frac{1}{1+\tau^2}$, we have $\mcI_{f^{\text{split}}(X)} = \mcI_{f^{\text{fisson}}(X)}$ and $\mcI_{g^{\text{split}}(X)} = \mcI_{g^{\text{fisson}}(X)}$.
 \eexa
 
 \bthm\label{thm:conjugacy}
