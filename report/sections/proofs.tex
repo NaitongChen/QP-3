@@ -57,7 +57,7 @@ we have that $h(z) = \prod_{i=1}^B \frac{1}{z_i!}, T(z) = \sum_{i=1}^B z_i, \the
 \[
 p(z \given \theta_1,\theta_2,\theta_3) &= \frac{1}{z!}\frac{\frac{\beta^{\alpha}}{\Gamma(\alpha)}}{\frac{(\beta+1)^{\left(\alpha + z\right)}}{\Gamma\left( \alpha + z \right)}}\\
 &= \frac{(\alpha+z-1)!}{(\alpha-1)!z!}\left(\frac{\beta}{\beta+1}\right)^\alpha\left(\frac{1}{\beta+1}\right)^z\\
-&= \distNB\left(z\given \frac{\beta}{\beta+1} \right);\\
+&= \distNB\left(z\given \alpha, \frac{\beta}{\beta+1} \right);\\
 p(x \given z, \theta_1, \theta_2, \theta_3) 
 &= \frac{(\beta+1)^{\left( \alpha+z \right)}}{\Gamma\left( \alpha + z \right)}
 \exp\left\{ \left( \alpha+z-1 \right)\log(x) - (\beta+1)x \right\}\\
@@ -76,4 +76,25 @@ p(x \given z, \theta_1, \theta_2, \theta_3)
 
 \bexa
 Suppose $X\distas \distGam(\alpha, \beta)$. Draw $Z \distas \distPoiss(\tau X)$, where $\tau\in(0,\infty)$ is a tuning parameter. Let $f(X) = Z$ and $g(X) = X$.
+\newline $ $
+By writing
+\[
+\distGam( x \given \alpha, \beta) = \frac{\beta^\alpha}{\Gamma(\alpha)}\exp\{(\alpha-1)\log x - \beta x \},
+\]
+where $\distGam(\cdot \given \alpha, \beta)$ denotes the pdf of $\distGam(\alpha, \beta)$, we have that $\theta_2 = \beta, \theta_1 = \alpha-1, \phi(x) = \log x, A(\phi(x)) = \exp(\phi(x)) = \exp(\log x) = x, m(x)=1$. Therefore, $H(\theta_1,\theta_2) = \frac{\theta_2^{(\theta_1+1)}}{\Gamma(\theta_1+1)}$. Now since
+\[
+\distPoiss(z \given \tau x) &= \frac{1}{z!}\exp\{z \log (\tau x) - \tau x\}\\
+&= \frac{1}{z!}\exp\{z \log \tau + z \log x - \tau x\}\\
+&= \frac{\tau^z}{z!}\exp\{z \log x - \tau x\},
+\]
+we have that $h(z) = \frac{\tau^z}{z!}, T(z) = z, \theta_3 = \tau$. Therefore, by \cref{thm:conjugacy},
+\[
+p(z \given \theta_1,\theta_2,\theta_3) &= \frac{\tau^z}{z!}\frac{\frac{\beta^{\alpha}}{\Gamma(\alpha)}}{\frac{(\beta+\tau)^{\left(\alpha + z\right)}}{\Gamma\left( \alpha + z \right)}}\\
+&= \frac{(\alpha+z-1)!}{(\alpha-1)!z!}\left(\frac{\beta}{\beta+\tau}\right)^\alpha\left(\frac{\tau}{\beta+\tau}\right)^z\\
+&= \distNB\left(z\given \alpha, \frac{\beta}{\beta+\tau} \right);\\
+p(x \given z, \theta_1, \theta_2, \theta_3) 
+&= \frac{(\beta+\tau)^{\left( \alpha+z \right)}}{\Gamma\left( \alpha + z \right)}
+\exp\left\{ \left( \alpha+z-1 \right)\log(x) - (\beta+\tau)x \right\}\\
+&= \distGam\left(x \given \alpha+z, \beta+\tau \right).
+\]
 \eexa
