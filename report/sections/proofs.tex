@@ -1,0 +1,79 @@
+\section{Proofs}
+\bexa
+Data fission can be viewed as a continuous version of data splitting.
+\eexa
+
+\bthm\label{thm:conjugacy}
+Suppose that for some $A(\cdot), \phi(\cdot), m(\cdot), \theta_1, \theta_2, H(\cdot, \cdot)$, the density of $X$ is given by
+\[
+p(x \given \theta_1, \theta_2) = m(x)H(\theta_1, \theta_2)\exp\{ \theta_1^\top \phi(x) - \theta_2^\top A(\phi(x)) \}.
+\]
+Suppose also that there exists $h(\cdot), T(\cdot), \theta_3$ such that
+\[
+p(z \given x, \theta_3) = h(z)\exp\{ \phi(x)^\top T(z) - \theta_3^\top A(\phi(x)) \}
+\]
+is a well-defined distribution. First, draw $Z \distas p(z \given X, \theta_3)$, and let $f(X) \defas Z$ and $g(X) \defas X$. Then, $(f(X), g(X))$ satisfy the data fission property (P2). Specifically, note that $f(X)$ has a known marginal distribution
+\[
+p(z\given \theta_1, \theta_2, \theta_3) = h(z) \frac{H(\theta_1, \theta_2)}{H(\theta_1 + T(z), \theta_2 + \theta_3)},
+\]
+while $g(X)$ has a known conditional distribution given $f(X)$, which is
+\[
+p(x\given z, \theta_1, \theta_2, \theta_3) = p(x \given \theta_1 + T(z), \theta_2 + \theta_3).
+\]
+\ethm
+\bprf
+Note that because the density $p(z \given x, \theta_3)$ must integrate to $1$, we can view the function $H(\theta_1, \theta_2)$ as a normalization factor since
+\[
+H(\theta_1, \theta_2) = \frac{1}{\int_{-\infty}^\infty m(x)\exp\{ \theta_1^\top \phi(x) - \theta_2^\top A(\phi(x)) \} dx}.
+\]
+Therefore, to compute the marginal density, we have
+\[
+p(z \given \theta_1, \theta_2, \theta_3) &= 
+\int_{-\infty}^\infty m(x)h(z)H(\theta_1, \theta_2)\exp \{ (T(z) + \theta_1)^\top \phi(x) - (\theta_2 + \theta_3)^\top A(\phi(x)) \} dx\\
+&= h(z)\frac{H(\theta_1, \theta_2)}{H(\theta_1 + T(z), \theta_2 + \theta_3)}.
+\]
+Similarly, the computation of the conditional density is straightforward
+\[
+p(x \given z, \theta_1, \theta_2, \theta_3) &= \frac{m(x)h(z)H(\theta_1, \theta_2)\exp\{(T(z)+\theta_1)^\top \phi(x) - (\theta_2 + \theta_3)^\top A(\phi(x))\}}{h(z)\frac{H(\theta_1, \theta_2)}{H(\theta_1 + T(z), \theta_2+\theta_3)}}\\
+&= m(x)H(\theta_1 + T(z), \theta_2 + \theta_3)\exp\{ \phi(x)^\top (\theta_1 + T(z)) - (\theta_2 + \theta_3)^\top A(\phi(x)) \}\\
+&= p(x \given \theta_1 + T(z), \theta_2 + \theta_3).
+\]
+This completes the proof.
+\eprf
+
+\bexa
+Suppose $X\distas \distGam(\alpha, \beta)$. Draw $Z=(Z_1,\cdots,Z_B)$ where each element is \iid $Z_i \distas \distPoiss(X)$ and $B\in\{1,2,\dots\}$ is a tuning parameter. Let $f(X) = Z$ and $g(X) = X$.
+\newline $ $
+By writing
+\[
+\distGam( x \given \alpha, \beta) = \frac{\beta^\alpha}{\Gamma(\alpha)}\exp\{(\alpha-1)\log x - \beta x \},
+\]
+where $\distGam(\cdot \given \alpha, \beta)$ denotes the pdf of $\distGam(\alpha, \beta)$, we have that $\theta_2 = \beta, \theta_1 = \alpha-1, \phi(x) = \log x, A(\phi(x)) = \exp(\phi(x)) = \exp(\log x) = x, m(x)=1$. Therefore, $H(\theta_1,\theta_2) = \frac{\theta_2^{(\theta_1+1)}}{\Gamma(\theta_1+1)}$. Now since
+\[
+\distPoiss(z \given x) &= \prod_{i=1}^B\frac{1}{z_i!}\exp\{z_i \log x - x\}\\
+&= \left(\prod_{i=1}^B\frac{1}{z_i!}\right)\exp\left\{ \left(\sum_{i=1}^B z_i\right) \log x - Bx \right\},
+\]
+we have that $h(z) = \prod_{i=1}^B \frac{1}{z_i!}, T(z) = \sum_{i=1}^B z_i, \theta_3 = B$. Therefore, by \cref{thm:conjugacy}, when $B=1$,
+\[
+p(z \given \theta_1,\theta_2,\theta_3) &= \frac{1}{z!}\frac{\frac{\beta^{\alpha}}{\Gamma(\alpha)}}{\frac{(\beta+1)^{\left(\alpha + z\right)}}{\Gamma\left( \alpha + z \right)}}\\
+&= \frac{(\alpha+z-1)!}{(\alpha-1)!z!}\left(\frac{\beta}{\beta+1}\right)^\alpha\left(\frac{1}{\beta+1}\right)^z\\
+&= \distNB\left(z\given \frac{\beta}{\beta+1} \right);\\
+p(x \given z, \theta_1, \theta_2, \theta_3) 
+&= \frac{(\beta+1)^{\left( \alpha+z \right)}}{\Gamma\left( \alpha + z \right)}
+\exp\left\{ \left( \alpha+z-1 \right)\log(x) - (\beta+1)x \right\}\\
+&= \distGam\left(x \given \alpha+z, \beta+1 \right).
+\]
+However, when $B>1$,
+\[
+p(z \given \theta_1,\theta_2,\theta_3) &= \left(\prod_{i=1}^B \frac{1}{z_i!}\right)\frac{\frac{\beta^{\alpha}}{\Gamma(\alpha)}}{\frac{(\beta+B)^{\left(\alpha + \sum_{i=1}^B z_i\right)}}{\Gamma\left( \alpha + \sum_{i=1}^B z_i \right)}}\\
+&\neq \prod_{i=1}^B \distNB\left( z_i \given \alpha, \frac{\beta}{\beta+1} \right);\\
+p(x \given z, \theta_1, \theta_2, \theta_3) 
+&= \frac{(\beta+B)^{\left( \alpha+\sum_{i=1}^B z_i \right)}}{\Gamma\left( \alpha + \sum_{i=1}^B z_i \right)}
+\exp\left\{ \left( \alpha-1+\sum_{i=1}^B z_i \right)\log(x) - (\beta+B)x \right\}\\
+&= \distGam\left(x \given \alpha+\sum_{i=1}^B z_i, \beta+B \right).
+\]
+\eexa
+
+\bexa
+Suppose $X\distas \distGam(\alpha, \beta)$. Draw $Z \distas \distPoiss(\tau X)$, where $\tau\in(0,\infty)$ is a tuning parameter. Let $f(X) = Z$ and $g(X) = X$.
+\eexa
