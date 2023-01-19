@@ -1,4 +1,4 @@
-\section{Proofs}
+\section{Proofs and examples}
 \bexa
 Data fission can be viewed as a continuous analog of data splitting in terms of the allocation of Fisher information.
 \newline $ $
@@ -64,7 +64,7 @@ p(x \given z, \theta_1, \theta_2, \theta_3) &= \frac{m(x)h(z)H(\theta_1, \theta_
 This completes the proof.
 \eprf
 
-\bexa
+\bexa\label{eg:discrete}
 Suppose $X\distas \distGam(\alpha, \beta)$. Draw $Z=(Z_1,\cdots,Z_B)$ where each element is \iid $Z_i \distas \distPoiss(X)$ and $B\in\{1,2,\dots\}$ is a tuning parameter. Let $f(X) = Z$ and $g(X) = X$.
 \newline $ $
 By writing
@@ -97,7 +97,7 @@ p(x \given z, \theta_1, \theta_2, \theta_3)
 \]
 \eexa
 
-\bexa
+\bexa\label{eg:continuous}
 Suppose $X\distas \distGam(\alpha, \beta)$. Draw $Z \distas \distPoiss(\tau X)$, where $\tau\in(0,\infty)$ is a tuning parameter. Let $f(X) = Z$ and $g(X) = X$.
 \newline $ $
 By writing
@@ -119,5 +119,83 @@ p(x \given z, \theta_1, \theta_2, \theta_3)
 &= \frac{(\beta+\tau)^{\left( \alpha+z \right)}}{\Gamma\left( \alpha + z \right)}
 \exp\left\{ \left( \alpha+z-1 \right)\log(x) - (\beta+\tau)x \right\}\\
 &= \distGam\left(x \given \alpha+z, \beta+\tau \right).
+\]
+\eexa
+
+\bexa
+Assume for all $i \in \{1,2,\dots,n\}$, $Y_i \distiid \distGam(\alpha, \exp(\beta^\top x_i))$, where each $x_i\in\reals^d$ is fixed. Following the data fission procedure in \cref{eg:discrete}, with $B=1$, we have that for all $i$, $f(Y_i) = Z_i, g(Y_i) = Y_i$. In the selection phase of selective inference, for some fixed $\lambda>0$, we can do model selection via the optimization below
+\[
+\hbeta_\lambda &= \argmin_{\beta\in\reals^d} -\sum_{i=1}^n \left(\log \distNB\left(z_i \given \alpha, \frac{\exp(\beta^\top x_i)}{\exp(\beta^\top x_i)+1}  \right)\right) + \lambda\|\beta_1\|\\
+&= \argmin_{\beta\in\reals^d} \left(\sum_{i=1}^n -\log{{z_i + \alpha - 1} \choose z_i } - z_i\log\left( \frac{1}{\exp(\beta^\top x_i)+1} \right) - \alpha\log\left( \frac{\exp(\beta^\top x_i)}{\exp(\beta^\top x_i)+1} \right)\right) + \lambda\|\beta_1\|,
+\]
+which is convex in $\beta$. Denote the index set of nonzero entries in $\hbeta_\lambda$ to be $\mcM$ and $|\mcM| = d' \leq d$.
+\newline $ $
+Using the selected features $\mcM$, with $x_{i,\mcM}$ denoting the selected features for the $i$th observation, we can obtain the estimates $\hbeta_n(\mcM)$ via
+\[
+&\hbeta_n(\mcM) \\
+&= \argmin_{\beta\in\reals^{d'}} - \sum_{i=1}^n \left( \log\distGam(y_i \given \alpha + z_i, \exp(\beta^\top x_{i,\mcM}) + 1) \right)\\
+&= \argmin_{\beta\in\reals^{d'}} \sum_{i=1}^n -(\alpha+z_i)\log\left( \exp(\beta^\top x_{i,\mcM}) + 1 \right) + \log\Gamma(\alpha+z_i) - (\alpha+z_i-1)\log y_i + \left( \exp(\beta^\top x_{i,\mcM}) + 1 \right)y_i,
+\]
+which is again convex in $\beta$ (although might need to increase $\alpha$ to ensure a minimum exists). To avoid not having a minimum, we can instead use the working model
+\[
+&\hbeta_n(\mcM) \\
+&= \argmin_{\beta\in\reals^{d'}} - \sum_{i=1}^n \left( \log\distGam(y_i \given \alpha + z_i, \exp(\beta^\top x_{i,\mcM}) ) \right)\\
+&= \argmin_{\beta\in\reals^{d'}} \sum_{i=1}^n -(\alpha+z_i)\log\left( \exp(\beta^\top x_{i,\mcM}) \right) + \log\Gamma(\alpha+z_i) - (\alpha+z_i-1)\log y_i + \left( \exp(\beta^\top x_{i,\mcM}) \right)y_i.
+\]
+For this problem, we have that
+\[
+\frac{\partial m_i}{\partial \eta_i} = \exp(\beta^\top x_{i,\mcM}), \quad
+m_i = \frac{\alpha+z_i}{\exp(\beta^\top x_{i,\mcM})}, \quad
+v_i = \frac{\alpha+z_i}{\left(\exp(\beta^\top x_{i,\mcM})\right)^2}.
+\]
+Let $D,V,M, G$ be diagonal matrices with
+\[
+D_{ii} = \frac{\partial m_i}{\partial \eta_i}, \quad
+V_{ii} = v_i, \quad
+M_{ii} = m_i, \quad
+G_{ii} = g(y_i) - m_i,
+\]
+then the plug-in estimator for variance becomes
+\[
+\hat{H}_n^{-1}\hat{V}_n\hat{H}_n^{-1} = \left( X_\mcM^\top D^2V^{-1} X_\mcM \right)^{-1}\left( X_\mcM^\top G^2 V^{-2} D^2 X_\mcM \right)\left( X_\mcM^\top D^2V^{-1} X_\mcM \right)^{-1}.
+\]
+\eexa
+
+\bexa
+Assume for all $i \in \{1,2,\dots,n\}$, $Y_i \distiid \distGam(\alpha, \exp(\beta^\top x_i))$, where each $x_i\in\reals^d$ is fixed. Following the data fission procedure in \cref{eg:continuous}, we have that for all $i$, $f(Y_i) = Z_i, g(Y_i) = Y_i$. In the selection phase of selective inference, for some fixed $\lambda>0$, we can do model selection via the optimization below
+\[
+\hbeta_\lambda &= \argmin_{\beta\in\reals^d} -\sum_{i=1}^n \left(\log \distNB\left(z_i \given \alpha, \frac{\exp(\beta^\top x_i)}{\exp(\beta^\top x_i)+\tau}  \right)\right) + \lambda\|\beta_1\|\\
+&= \argmin_{\beta\in\reals^d} \left(\sum_{i=1}^n -\log{{z_i + \alpha - 1} \choose z_i } - z_i\log\left( \frac{1}{\exp(\beta^\top x_i)+\tau} \right) - \alpha\log\left( \frac{\exp(\beta^\top x_i)}{\exp(\beta^\top x_i)+\tau} \right)\right) + \lambda\|\beta_1\|,
+\]
+which is convex in $\beta$. Denote the index set of nonzero entries in $\hbeta_\lambda$ to be $\mcM$ and $|\mcM| = d' \leq d$.
+\newline $ $
+Using the selected features $\mcM$, with $x_{i,\mcM}$ denoting the selected features for the $i$th observation, we can obtain the estimates $\hbeta_n(\mcM)$ via
+\[
+&\hbeta_n(\mcM) \\
+&= \argmin_{\beta\in\reals^{d'}} - \sum_{i=1}^n \left( \log\distGam(y_i \given \alpha + z_i, \exp(\beta^\top x_{i,\mcM}) + \tau) \right)\\
+&= \argmin_{\beta\in\reals^{d'}} \sum_{i=1}^n -(\alpha+z_i)\log\left( \exp(\beta^\top x_{i,\mcM}) + \tau \right) + \log\Gamma(\alpha+z_i) - (\alpha+z_i-1)\log y_i + \left( \exp(\beta^\top x_{i,\mcM}) + \tau \right)y_i,
+\]
+which is again convex in $\beta$ (although might need to decrease $\tau$ to ensure a minimum exists). To avoid not having a minimum, we can instead use the working model
+\[
+&\hbeta_n(\mcM) \\
+&= \argmin_{\beta\in\reals^{d'}} - \sum_{i=1}^n \left( \log\distGam(y_i \given \alpha + z_i, \exp(\beta^\top x_{i,\mcM}) ) \right)\\
+&= \argmin_{\beta\in\reals^{d'}} \sum_{i=1}^n -(\alpha+z_i)\log\left( \exp(\beta^\top x_{i,\mcM}) \right) + \log\Gamma(\alpha+z_i) - (\alpha+z_i-1)\log y_i + \left( \exp(\beta^\top x_{i,\mcM}) \right)y_i.
+\]
+For this problem, we have that
+\[
+\frac{\partial m_i}{\partial \eta_i} = \exp(\beta^\top x_{i,\mcM}), \quad
+m_i = \frac{\alpha+z_i}{\exp(\beta^\top x_{i,\mcM})}, \quad
+v_i = \frac{\alpha+z_i}{\left(\exp(\beta^\top x_{i,\mcM})\right)^2}.
+\]
+Let $D,V,M, G$ be diagonal matrices with
+\[
+D_{ii} = \frac{\partial m_i}{\partial \eta_i}, \quad
+V_{ii} = v_i, \quad
+M_{ii} = m_i, \quad
+G_{ii} = g(y_i) - m_i,
+\]
+then the plug-in estimator for variance becomes
+\[
+\hat{H}_n^{-1}\hat{V}_n\hat{H}_n^{-1} = \left( X_\mcM^\top D^2V^{-1} X_\mcM \right)^{-1}\left( X_\mcM^\top G^2 V^{-2} D^2 X_\mcM \right)\left( X_\mcM^\top D^2V^{-1} X_\mcM \right)^{-1}.
 \]
 \eexa
