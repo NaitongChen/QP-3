@@ -89,7 +89,7 @@ p(x \given z, \theta_1, \theta_2, \theta_3)
 However, when $B>1$,
 \[
 p(z \given \theta_1,\theta_2,\theta_3) &= \left(\prod_{i=1}^B \frac{1}{z_i!}\right)\frac{\frac{\beta^{\alpha}}{\Gamma(\alpha)}}{\frac{(\beta+B)^{\left(\alpha + \sum_{i=1}^B z_i\right)}}{\Gamma\left( \alpha + \sum_{i=1}^B z_i \right)}}\\
-&\neq \prod_{i=1}^B \distNB\left( z_i \given \alpha, \frac{\beta}{\beta+1} \right);\\
+&\neq \prod_{i=1}^B \distNB\left( z_i \given \alpha, \frac{\beta}{\beta+B} \right);\\
 p(x \given z, \theta_1, \theta_2, \theta_3) 
 &= \frac{(\beta+B)^{\left( \alpha+\sum_{i=1}^B z_i \right)}}{\Gamma\left( \alpha + \sum_{i=1}^B z_i \right)}
 \exp\left\{ \left( \alpha-1+\sum_{i=1}^B z_i \right)\log(x) - (\beta+B)x \right\}\\
