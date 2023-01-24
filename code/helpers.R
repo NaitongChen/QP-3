@@ -5,7 +5,7 @@ generate_data <- function(n, p, beta, signal, mu_x, sigma_x, sigma_y) {
   X = matrix(rnorm(n*p, mu_x, sigma_x), nrow=n)
   y = X %*% (signal * beta) + rnorm(n, 0, sigma_y)
   
-  return(list(X,y))
+  return(list(X,y, X %*% (signal * beta)))
 }
 
 split_data <- function(X, y, a) {
@@ -16,7 +16,8 @@ split_data <- function(X, y, a) {
   first_half <- shuffle_inds[1:split_size]
   second_half <- shuffle_inds[(split_size+1):n]
   
-  return(list(X[first_half,], y[first_half], X[second_half,], y[second_half]))
+  return(list(X[first_half,], y[first_half], 
+              X[second_half,], y[second_half], second_half))
 }
 
 fission_data_1 <- function(X, y, tau, sigma_y) {
@@ -42,10 +43,9 @@ variable_selection <- function(X, y) {
   n = nrow(X)
   p = ncol(X)
   cvfit <- cv.glmnet(X, drop(y), type.measure = "mse", family = "gaussian", 
-                     alpha = 1, nfolds = n, grouped = FALSE, intercept = FALSE)
+                     alpha = 1, intercept = FALSE)
   final_fit <- glmnet(X, drop(y), type.measure = "mse", family = "gaussian", 
-                      alpha = 1, lambda = cvfit$lambda.1se, grouped = FALSE, 
-                      intercept = FALSE)
+                      alpha = 1, lambda = cvfit$lambda.1se, intercept = FALSE)
   selected <- (1:p)[drop(final_fit$beta) != 0]
 
   return(selected)
@@ -175,8 +175,10 @@ plot_single_trial <- function(trial, method, n, sigma_y, beta, signal,
                 as.character(sigma_y), "_", as.character(trial), ".png"))
 }
 
-metric_single_trial <- function(beta, signal, selected, beta_hat, CIs) {
+metric_single_trial <- function(beta, signal, selected, 
+                                beta_hat, CIs, X2, y2, true_mu) {
   p = length(beta)
+  p_selected = length(selected)
   index <- 1:p
   lowers = rep(0, p)
   uppers = rep(0, p)
@@ -186,8 +188,19 @@ metric_single_trial <- function(beta, signal, selected, beta_hat, CIs) {
   beta_hats[selected] = beta_hat
   beta = signal * beta
   
+  X2 = matrix(drop(X2[, selected]), ncol = length(selected), byrow = FALSE)
+  normal_mat = tryCatch({
+    f = solve(t(X2) %*% X2)
+  }, error = function(err) {
+    f = solve(t(X2) %*% X2 + (1e-8) * diag(p))
+    return(f)
+  })
+  
+  target_beta = normal_mat %*% t(X2) %*% true_mu
+  
   df = data.frame(index, beta, beta_hats, lowers, uppers)
   df_selected = df[selected,]
+  df_selected$target_beta = target_beta
   
   pow = length(intersect((1:p)[beta != 0], selected)) / length((1:p)[beta != 0])
   prec = length(intersect((1:p)[beta != 0], selected)) / length(selected)
@@ -195,7 +208,8 @@ metric_single_trial <- function(beta, signal, selected, beta_hat, CIs) {
   
   FCR = 0
   for (i in 1:length(selected)) {
-    if (CIs[i,1] <= df_selected$beta[i] & CIs[i,2] >= df_selected$beta[i]) {
+    if (CIs[i,1] <= df_selected$target_beta[i] & 
+        CIs[i,2] >= df_selected$target_beta[i]) {
       FCR = FCR + 0
     } else {
       FCR = FCR + 1
@@ -247,11 +261,11 @@ plot_metric <- function(trial, ns, sigma_y, metric, dat1, dat2, dat3) {
   df3 = data.frame(size, medians, first_q, third_q)
   
   ggplot() +
-    geom_point(aes(size, medians), df1, color="red") +
+    geom_point(aes(size, medians), df1, color="red") + geom_line(aes(size, medians), df1, color="red") +
     #geom_errorbar(aes(x = df1$size, ymin = df1$first_q, ymax = df1$third_q), color="red") +
-    geom_point(aes(size, medians), df2, color="blue") +
+    geom_point(aes(size, medians), df2, color="blue") + geom_line(aes(size, medians), df2, color="blue") +
     #geom_errorbar(aes(x = df2$size, ymin = df2$first_q, ymax = df2$third_q), color="blue") +
-    geom_point(aes(size, medians), df3, color="green") +
+    geom_point(aes(size, medians), df3, color="green") + geom_line(aes(size, medians), df3, color="green") +
     #geom_errorbar(aes(x = df3$size, ymin = df3$first_q, ymax = df3$third_q), color="green") +
     ylab(metric)
   
