@@ -17,7 +17,7 @@ sigma_x = 1
 sigma_ys = c(0.25, 0.5, 1, 2)
 a = 0.5
 sig = 0.05
-n_trial = 20
+n_trial = 1
 methods = c("split", "p1", "p2")
 metrics = c("power", "precision", "len", "FCR", "L2")
 tau = 1
@@ -71,7 +71,7 @@ for (i in 1:n_trial) {
         dat = build_CI_split(X2, y2, sigma_ys[k], selected, sig)
         beta_hat = dat[[1]]
         CIs = dat[[2]]
-        plot_single_trial(i, methods[1], ns[j], sigma_ys[k], beta, signal, 
+        plot_single_trial(i, methods[1], ns[j], sigma_ys[k], beta, signal,
                           selected, beta_hat, CIs)
         dat = metric_single_trial(beta, signal, selected, 
                                   beta_hat, CIs, X2, y2, true_mu[idx])
@@ -95,7 +95,7 @@ for (i in 1:n_trial) {
         dat = build_CI_1(X2, y2, tau, sigma_ys[k], selected, sig)
         beta_hat = dat[[1]]
         CIs = dat[[2]]
-        plot_single_trial(i, methods[2], ns[j], sigma_ys[k], beta, signal, 
+        plot_single_trial(i, methods[2], ns[j], sigma_ys[k], beta, signal,
                           selected, beta_hat, CIs)
         dat = metric_single_trial(beta, signal, selected, 
                                   beta_hat, CIs, X2, y2, true_mu)
@@ -119,7 +119,7 @@ for (i in 1:n_trial) {
         dat = build_CI_2(X2, y2, tau, sigma_ys[k], selected, sig)
         beta_hat = dat[[1]]
         CIs = dat[[2]]
-        plot_single_trial(i, methods[3], ns[j], sigma_ys[k], beta, signal, 
+        plot_single_trial(i, methods[3], ns[j], sigma_ys[k], beta, signal,
                           selected, beta_hat, CIs)
         dat = metric_single_trial(beta, signal, selected, 
                                   beta_hat, CIs, X2, y2, true_mu)

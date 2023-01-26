@@ -66,16 +66,18 @@ build_CI_split <- function(X, y, sigma_y, selected, sig) {
     return(f)
   })
   
-  cov = (normal_mat %*% t(X) %*% (sigma_y^2 * diag(n)) 
-         %*% X %*% normal_mat)
+  # cov = (normal_mat %*% t(X) %*% (sigma_y^2 * diag(n)) 
+  #        %*% X %*% normal_mat)
+  cov = (sigma_y^2) * normal_mat
 
-  z = qnorm(1-(sig/2/length(selected)))
+  # z = qnorm(1-(sig/2/length(selected)))
+  z = qnorm(1-(sig/2))
 
   CIs = matrix(rep(0, p*2), nrow = p)
 
   for (i in 1:p) {
-    CIs[i,1] = beta_hat[i] - z * cov[i,i]
-    CIs[i,2] = beta_hat[i] + z * cov[i,i]
+    CIs[i,1] = beta_hat[i] - z * sqrt(cov[i,i])
+    CIs[i,2] = beta_hat[i] + z * sqrt(cov[i,i])
   }
 
   return(list(beta_hat, CIs))
@@ -96,16 +98,18 @@ build_CI_1 <- function(X, y, tau, sigma_y, selected, sig) {
     return(f)
   })
   
-  cov = (1 + tau^-2) * (normal_mat %*% t(X) %*% (sigma_y^2 * diag(n)) 
-                        %*% X %*% normal_mat)
+  # cov = (1 + tau^-2) * (normal_mat %*% t(X) %*% (sigma_y^2 * diag(n)) 
+  #                       %*% X %*% normal_mat)
+  cov = ((1 + tau^-2) * (sigma_y^2)) * normal_mat
   
-  z = qnorm(1-(sig/2/length(selected)))
+  # z = qnorm(1-(sig/2/length(selected)))
+  z = qnorm(1-(sig/2))
   
   CIs = matrix(rep(0, p*2), nrow = p)
   
   for (i in 1:p) {
-    CIs[i,1] = beta_hat[i] - z * cov[i,i]
-    CIs[i,2] = beta_hat[i] + z * cov[i,i]
+    CIs[i,1] = beta_hat[i] - z * sqrt(cov[i,i])
+    CIs[i,2] = beta_hat[i] + z * sqrt(cov[i,i])
   }
   
   return(list(beta_hat, CIs))
@@ -126,16 +130,18 @@ build_CI_2 <- function(X, y, tau, sigma_y, selected, sig) {
     return(f)
   })
   
-  cov = (tau/(tau + 1)) * (normal_mat %*% t(X) %*% (sigma_y^2 * diag(n)) 
-                           %*% X %*% normal_mat)
+  # cov = (tau/(tau + 1)) * (normal_mat %*% t(X) %*% (sigma_y^2 * diag(n)) 
+  #                          %*% X %*% normal_mat)
+  cov = ((tau/(tau + 1)) * (sigma_y^2)) * normal_mat
   
-  z = qnorm(1-(sig/2/length(selected)))
+  # z = qnorm(1-(sig/2/length(selected)))
+  z = qnorm(1-(sig/2))
   
   CIs = matrix(rep(0, p*2), nrow = p)
   
   for (i in 1:p) {
-    CIs[i,1] = beta_hat[i] - z * cov[i,i]
-    CIs[i,2] = beta_hat[i] + z * cov[i,i]
+    CIs[i,1] = beta_hat[i] - z * sqrt(cov[i,i])
+    CIs[i,2] = beta_hat[i] + z * sqrt(cov[i,i])
   }
   
   return(list(beta_hat, CIs))
@@ -219,7 +225,11 @@ metric_single_trial <- function(beta, signal, selected,
   
   bhat_full = rep(0, p)
   bhat_full[selected] = beta_hat
-  L2_err = norm(as.matrix(signal*beta - bhat_full), type="2")
+  
+  combined_idx = union((1:p)[beta != 0], selected)
+  L2_err = (1/length(combined_idx)) * (norm(as.matrix(signal*beta[combined_idx] 
+                                                     - bhat_full[combined_idx]), 
+                                           type="2")^2)
   
   return(list(pow, prec, avg_CI_length, FCR, L2_err))
 }
@@ -260,14 +270,19 @@ plot_metric <- function(trial, ns, sigma_y, metric, dat1, dat2, dat3) {
   
   df3 = data.frame(size, medians, first_q, third_q)
   
+  colors <- c("DS" = "orange", "DF1" = "blue", "DF2" = "green")
+  
   ggplot() +
-    geom_point(aes(size, medians), df1, color="red") + geom_line(aes(size, medians), df1, color="red") +
+    geom_point(aes(size, medians), df1, color="red") + geom_line(aes(size, medians, color="DS"), df1, size=3) +
     #geom_errorbar(aes(x = df1$size, ymin = df1$first_q, ymax = df1$third_q), color="red") +
-    geom_point(aes(size, medians), df2, color="blue") + geom_line(aes(size, medians), df2, color="blue") +
+    geom_point(aes(size, medians), df2, color="blue") + geom_line(aes(size, medians, color="DF1"), df2, size=2) +
     #geom_errorbar(aes(x = df2$size, ymin = df2$first_q, ymax = df2$third_q), color="blue") +
-    geom_point(aes(size, medians), df3, color="green") + geom_line(aes(size, medians), df3, color="green") +
+    geom_point(aes(size, medians), df3, color="green") + geom_line(aes(size, medians, color="DF2"), df3, size=1) +
     #geom_errorbar(aes(x = df3$size, ymin = df3$first_q, ymax = df3$third_q), color="green") +
-    ylab(metric)
+    labs(x = "sample size",
+         y = metric,
+         color = "Legend") +
+    scale_color_manual(values = colors)
   
   ggsave(paste0("../plot/", metric, "_", 
                 as.character(sigma_y), ".png"))
