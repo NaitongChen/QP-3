@@ -16,8 +16,8 @@ split_data <- function(X, y, a) {
   first_half <- shuffle_inds[1:split_size]
   second_half <- shuffle_inds[(split_size+1):n]
   
-  return(list(X[first_half,], y[first_half], 
-              X[second_half,], y[second_half], second_half))
+  return(list(X[first_half,], y[first_half,], 
+              X[second_half,], y[second_half,], second_half))
 }
 
 fission_data_1 <- function(X, y, tau, sigma_y) {
@@ -148,7 +148,7 @@ build_CI_2 <- function(X, y, tau, sigma_y, selected, sig) {
 }
 
 plot_single_trial <- function(trial, method, n, sigma_y, beta, signal, 
-                              selected, beta_hat, CIs) {
+                              selected, beta_hat, CIs, true_mu, X2) {
   p = length(beta)
   index <- 1:p
   lowers = rep(0, p)
@@ -162,6 +162,18 @@ plot_single_trial <- function(trial, method, n, sigma_y, beta, signal,
   df = data.frame(index, beta, beta_hats, lowers, uppers)
   df_selected = df[selected,]
   
+  X2 = matrix(drop(X2[, selected]), ncol = length(selected), byrow = FALSE)
+  normal_mat = tryCatch({
+    f = solve(t(X2) %*% X2)
+  }, error = function(err) {
+    f = solve(t(X2) %*% X2 + (1e-8) * diag(p))
+    return(f)
+  })
+  
+  target_beta = normal_mat %*% t(X2) %*% true_mu
+  
+  df_selected$target_beta = target_beta
+  
   colors = c()
   for (i in 1:length(selected)) {
     if (CIs[i,1] <= df_selected$beta[i] & CIs[i,2] >= df_selected$beta[i]) {
@@ -171,11 +183,12 @@ plot_single_trial <- function(trial, method, n, sigma_y, beta, signal,
     }
   }
   
-  ggplot(df_selected, aes(index, beta)) +
+  print(ggplot(df_selected, aes(index, beta)) +
     geom_point(shape=4, size=4, color="blue") +
     geom_errorbar(aes(ymin = lowers, ymax = uppers), color=colors) +
     geom_point(aes(index, beta_hats), color=colors) +
-    geom_point(aes(index, beta), df)
+    geom_point(aes(index, beta), df) +
+    geom_point(aes(index, target_beta), shape=9, size=9, color="orange"))
 
   ggsave(paste0("../plot/", method, "_", as.character(n), "_", 
                 as.character(sigma_y), "_", as.character(trial), ".png"))
@@ -226,10 +239,11 @@ metric_single_trial <- function(beta, signal, selected,
   bhat_full = rep(0, p)
   bhat_full[selected] = beta_hat
   
-  combined_idx = union((1:p)[beta != 0], selected)
-  L2_err = (1/length(combined_idx)) * (norm(as.matrix(signal*beta[combined_idx] 
-                                                     - bhat_full[combined_idx]), 
-                                           type="2")^2)
+  # combined_idx = union((1:p)[beta != 0], selected)
+  # L2_err = (1/length(combined_idx)) * (norm(as.matrix(signal*beta[combined_idx] 
+  #                                                    - bhat_full[combined_idx]), 
+  #                                          type="2")^2)
+  L2_err = (1/length(selected)) * norm(target_beta - beta_hat, type="2")^2
   
   return(list(pow, prec, avg_CI_length, FCR, L2_err))
 }
@@ -274,11 +288,11 @@ plot_metric <- function(trial, ns, sigma_y, metric, dat1, dat2, dat3) {
   
   ggplot() +
     geom_point(aes(size, medians), df1, color="red") + geom_line(aes(size, medians, color="DS"), df1, size=3) +
-    #geom_errorbar(aes(x = df1$size, ymin = df1$first_q, ymax = df1$third_q), color="red") +
+    # geom_errorbar(aes(x = df1$size, ymin = df1$first_q, ymax = df1$third_q, color="DS"), size=3) +
     geom_point(aes(size, medians), df2, color="blue") + geom_line(aes(size, medians, color="DF1"), df2, size=2) +
-    #geom_errorbar(aes(x = df2$size, ymin = df2$first_q, ymax = df2$third_q), color="blue") +
+    # geom_errorbar(aes(x = df2$size, ymin = df2$first_q, ymax = df2$third_q, color="DF1"), size=2) +
     geom_point(aes(size, medians), df3, color="green") + geom_line(aes(size, medians, color="DF2"), df3, size=1) +
-    #geom_errorbar(aes(x = df3$size, ymin = df3$first_q, ymax = df3$third_q), color="green") +
+    # geom_errorbar(aes(x = df3$size, ymin = df3$first_q, ymax = df3$third_q, color="DF2"), size=1) +
     labs(x = "sample size",
          y = metric,
          color = "Legend") +

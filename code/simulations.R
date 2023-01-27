@@ -14,10 +14,11 @@ beta[20] = -1
 signal = 1
 mu_x = 0
 sigma_x = 1
-sigma_ys = c(0.25, 0.5, 1, 2)
+# sigma_ys = c(0.25, 0.5, 1, 2)
+sigma_ys = c(1)
 a = 0.5
 sig = 0.05
-n_trial = 1
+n_trial = 200
 methods = c("split", "p1", "p2")
 metrics = c("power", "precision", "len", "FCR", "L2")
 tau = 1
@@ -49,9 +50,9 @@ for (i in 1:n_trial) {
   print(paste0(as.character(i), "/", as.character(n_trial)))
   set.seed(i)
   for (j in 1:length(ns)) {
-    print(paste0("n=", as.character(ns[j])))
+    # print(paste0("n=", as.character(ns[j])))
     for (k in 1:length(sigma_ys)) {
-      print(paste0("sigma_y=", as.character(sigma_ys[k])))
+      # print(paste0("sigma_y=", as.character(sigma_ys[k])))
       dat = generate_data(ns[j], p, beta, signal, mu_x, sigma_x, sigma_ys[k])
       X = dat[[1]]
       y = dat[[2]]
@@ -67,12 +68,15 @@ for (i in 1:n_trial) {
       selected = variable_selection(X1, y1)
       if (length(selected) == 0) {
         noselect_split[j,k,i] = 1
+        pow_split[j,k,i] = 0
+        fcr_split[j,k,i] = 0
+        l2_split[j,k,i] = (1/length(beta[beta != 0])) * norm(beta[beta != 0], type="2")^2
       } else {
         dat = build_CI_split(X2, y2, sigma_ys[k], selected, sig)
         beta_hat = dat[[1]]
         CIs = dat[[2]]
-        plot_single_trial(i, methods[1], ns[j], sigma_ys[k], beta, signal,
-                          selected, beta_hat, CIs)
+        # plot_single_trial(i, methods[1], ns[j], sigma_ys[k], beta, signal,
+        #                   selected, beta_hat, CIs, true_mu[idx], X2)
         dat = metric_single_trial(beta, signal, selected, 
                                   beta_hat, CIs, X2, y2, true_mu[idx])
         pow_split[j,k,i] = dat[[1]]
@@ -91,12 +95,15 @@ for (i in 1:n_trial) {
       selected = variable_selection(X1, y1)
       if (length(selected) == 0) {
         noselect_p1[j,k,i] = 1
+        pow_split[j,k,i] = 0
+        fcr_split[j,k,i] = 0
+        l2_split[j,k,i] = (1/length(beta[beta != 0])) * norm(beta[beta != 0], type="2")^2
       } else {
         dat = build_CI_1(X2, y2, tau, sigma_ys[k], selected, sig)
         beta_hat = dat[[1]]
         CIs = dat[[2]]
-        plot_single_trial(i, methods[2], ns[j], sigma_ys[k], beta, signal,
-                          selected, beta_hat, CIs)
+        # plot_single_trial(i, methods[2], ns[j], sigma_ys[k], beta, signal,
+        #                   selected, beta_hat, CIs, true_mu, X2)
         dat = metric_single_trial(beta, signal, selected, 
                                   beta_hat, CIs, X2, y2, true_mu)
         pow_p1[j,k,i] = dat[[1]]
@@ -115,12 +122,15 @@ for (i in 1:n_trial) {
       selected = variable_selection(X1, y1)
       if (length(selected) == 0) {
         noselect_p2[j,k,i] = 1
+        pow_split[j,k,i] = 0
+        fcr_split[j,k,i] = 0
+        l2_split[j,k,i] = (1/length(beta[beta != 0])) * norm(beta[beta != 0], type="2")^2
       } else {
         dat = build_CI_2(X2, y2, tau, sigma_ys[k], selected, sig)
         beta_hat = dat[[1]]
         CIs = dat[[2]]
-        plot_single_trial(i, methods[3], ns[j], sigma_ys[k], beta, signal,
-                          selected, beta_hat, CIs)
+        # plot_single_trial(i, methods[3], ns[j], sigma_ys[k], beta, signal,
+        #                   selected, beta_hat, CIs, true_mu, X2)
         dat = metric_single_trial(beta, signal, selected, 
                                   beta_hat, CIs, X2, y2, true_mu)
         pow_p2[j,k,i] = dat[[1]]
@@ -139,34 +149,40 @@ for (k in 1:length(sigma_ys)) {
   # split
   dat1 = list()
   for (i in 1:length(ns)) {
-    dat1[[i]] =  as_array(pow_split[i,k,])
+    idx = (1:n_trial)[as_array(noselect_split[i,k,]) == 0]
+    dat1[[i]] =  as_array(pow_split[i,k,][idx])
   }
   
   dat2 = list()
   for (i in 1:length(ns)) {
-    dat2[[i]] = as_array(pow_p1[i,k,])
+    idx = (1:n_trial)[as_array(noselect_p1[i,k,]) == 0]
+    dat2[[i]] = as_array(pow_p1[i,k,][idx])
   }
   
   dat3 = list()
   for (i in 1:length(ns)) {
-    dat3[[i]] = as_array(pow_p2[i,k,])
+    idx = (1:n_trial)[as_array(noselect_p2[i,k,]) == 0]
+    dat3[[i]] = as_array(pow_p2[i,k,][idx])
   }
   
   plot_metric(trial, ns, sigma_ys[k], metrics[1], dat1, dat2, dat3)
   
   dat1 = list()
   for (i in 1:length(ns)) {
-    dat1[[i]] = as_array(prec_split[i,k,])
+    idx = (1:n_trial)[as_array(noselect_split[i,k,]) == 0]
+    dat1[[i]] = as_array(prec_split[i,k,][idx])
   }
   
   dat2 = list()
   for (i in 1:length(ns)) {
-    dat2[[i]] = as_array(prec_p1[i,k,])
+    idx = (1:n_trial)[as_array(noselect_p1[i,k,]) == 0]
+    dat2[[i]] = as_array(prec_p1[i,k,][idx])
   }
   
   dat3 = list()
   for (i in 1:length(ns)) {
-    dat3[[i]] = as_array(prec_p2[i,k,])
+    idx = (1:n_trial)[as_array(noselect_p2[i,k,]) == 0]
+    dat3[[i]] = as_array(prec_p2[i,k,][idx])
   }
   
   plot_metric(trial, ns, sigma_ys[k], metrics[2], dat1, dat2, dat3)
@@ -193,17 +209,20 @@ for (k in 1:length(sigma_ys)) {
   
   dat1 = list()
   for (i in 1:length(ns)) {
-    dat1[[i]] = as_array(fcr_split[i,k,])
+    idx = (1:n_trial)[as_array(noselect_split[i,k,]) == 0]
+    dat1[[i]] = as_array(fcr_split[i,k,][idx])
   }
   
   dat2 = list()
   for (i in 1:length(ns)) {
-    dat2[[i]] = as_array(fcr_p1[i,k,])
+    idx = (1:n_trial)[as_array(noselect_p1[i,k,]) == 0]
+    dat2[[i]] = as_array(fcr_p1[i,k,][idx])
   }
   
   dat3 = list()
   for (i in 1:length(ns)) {
-    dat3[[i]] = as_array(fcr_p2[i,k,])
+    idx = (1:n_trial)[as_array(noselect_p2[i,k,]) == 0]
+    dat3[[i]] = as_array(fcr_p2[i,k,][idx])
   }
   
   plot_metric(trial, ns, sigma_ys[k], metrics[4], dat1, dat2, dat3)
