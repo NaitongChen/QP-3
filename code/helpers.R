@@ -301,3 +301,50 @@ plot_metric <- function(trial, ns, sigma_y, metric, dat1, dat2, dat3) {
   ggsave(paste0("../plot/", metric, "_", 
                 as.character(sigma_y), ".png"))
 }
+
+compute_l2 <- function(tau, beta, signal, selected, 
+                       beta_hat, CIs, X2, y1, true_mu) {
+  p = length(beta)
+  X2 = matrix(drop(X2[, selected]), ncol = length(selected), byrow = FALSE)
+  normal_mat = tryCatch({
+    f = solve(t(X2) %*% X2)
+  }, error = function(err) {
+    f = solve(t(X2) %*% X2 + (1e-8) * diag(p))
+    return(f)
+  })
+
+  target_beta = normal_mat %*% t(X2) %*% true_mu
+  
+  true_mean = ((tau/(1+tau)) * target_beta) + ((1/(1+tau)) * (normal_mat %*% t(X2) %*% y1))
+  
+  # return((1/length(selected)) * norm(target_beta - true_mean, type="2")^2)
+  return(norm(target_beta - true_mean, type="2") / norm(target_beta, type="2"))
+}
+
+plot_l2 <- function(ns, sigma_y, metric, dat) {
+  n_size = length(ns)
+  size = ns
+  medians = rep(0, n_size)
+  first_q = rep(0, n_size)
+  third_q = rep(0, n_size)
+  for (i in 1:n_size) {
+    medians[i] = median(dat[[i]])
+    first_q[i] = quantile(dat[[i]], 0.25)
+    third_q[i] = quantile(dat[[i]], 0.75)
+  }
+  
+  df = data.frame(size, medians, first_q, third_q)
+  
+  colors <- c("DF2" = "green")
+  
+  ggplot() +
+    geom_point(aes(size, medians), df, color="green") + geom_line(aes(size, medians, color="DF2"), df, size=1) +
+    # geom_errorbar(aes(x = df$size, ymin = df$first_q, ymax = df$third_q, color="DF2"), size=1) +
+    labs(x = "sample size",
+         y = metric,
+         color = "Legend") +
+    scale_color_manual(values = colors)
+  
+  ggsave(paste0("../plot/", metric, "_", 
+                as.character(sigma_y), ".png"))
+}

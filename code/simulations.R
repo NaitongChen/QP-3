@@ -43,6 +43,7 @@ prec_p2 = torch_zeros(c(length(ns), length(sigma_ys), n_trial))
 len_p2 = torch_zeros(c(length(ns), length(sigma_ys), n_trial))
 fcr_p2 = torch_zeros(c(length(ns), length(sigma_ys), n_trial))
 l2_p2 = torch_zeros(c(length(ns), length(sigma_ys), n_trial))
+l2_ideal = torch_zeros(c(length(ns), length(sigma_ys), n_trial))
 noselect_p2 = torch_zeros(c(length(ns), length(sigma_ys), n_trial))
 
 # run simulations
@@ -138,6 +139,8 @@ for (i in 1:n_trial) {
         len_p2[j,k,i] = dat[[3]]
         fcr_p2[j,k,i] = dat[[4]]
         l2_p2[j,k,i] = dat[[5]] 
+        l2_ideal[j,k,i] = compute_l2(tau, beta, signal, selected, 
+                                     beta_hat, CIs, X2, y1, true_mu)
       }
     }
   }
@@ -246,4 +249,12 @@ for (k in 1:length(sigma_ys)) {
   }
   
   plot_metric(trial, ns, sigma_ys[k], metrics[5], dat1, dat2, dat3)
+  
+  dat = list()
+  for (i in 1:length(ns)) {
+    idx = (1:n_trial)[as_array(noselect_p2[i,k,]) == 0]
+    dat[[i]] = as_array(l2_ideal[i,k,][idx])
+  }
+  
+  plot_l2(ns, sigma_ys[k], "L2 ideal", dat)
 }

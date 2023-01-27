@@ -4,7 +4,7 @@ source("helpers.R")
 library(torch)
 
 # set parameters
-p = 50
+p = 20
 beta = rep(0, p)
 beta[1] = 1
 beta[2] = -1
@@ -21,7 +21,7 @@ metrics = c("power", "precision", "len", "FCR", "L2")
 tau = 1
 
 sigma_y = 1
-n = 10
+n = 200
 
 set.seed(runif(1, 1, 1000))
 dat = generate_data(n, p, beta, signal, mu_x, sigma_x, sigma_y)
