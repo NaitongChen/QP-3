@@ -175,7 +175,7 @@ Using the selected features $\mcM$, with $x_{i,\mcM}$ denoting the selected feat
 &= \argmin_{\beta\in\reals^{d'}} - \sum_{i=1}^n \left( \log\distGam(y_i \given \alpha + z_i, \exp(\beta^\top x_{i,\mcM}) + \tau) \right)\\
 &= \argmin_{\beta\in\reals^{d'}} \sum_{i=1}^n -(\alpha+z_i)\log\left( \exp(\beta^\top x_{i,\mcM}) + \tau \right) + \log\Gamma(\alpha+z_i) - (\alpha+z_i-1)\log y_i + \left( \exp(\beta^\top x_{i,\mcM}) + \tau \right)y_i,
 \]
-which may be convex in $\beta$ but without an argmin, or non-convex (depending on the value of $\alpha$). Therefore, we can instead use the working model
+which may be convex in $\beta$ but without an argmin, or non-convex (depending on the value of $\alpha$). Therefore, we can instead use an alternative working model
 \[
 &\hbeta_n(\mcM) \\
 &= \argmin_{\beta\in\reals^{d'}} - \sum_{i=1}^n \left( \log\distGam(y_i \given \alpha + z_i, \exp(\beta^\top x_{i,\mcM}) ) \right)\\
@@ -192,12 +192,15 @@ Let $D,V,M, G$ be diagonal matrices with
 D_{ii} = \frac{\partial m_i}{\partial \eta_i}, \quad
 V_{ii} = v_i, \quad
 M_{ii} = m_i, \quad
-G_{ii} = g(y_i) - m_i,
+G_{ii} = g(y_i) - m_i.
 \]
-then the plug-in estimator for variance becomes
+Following the procedure in Appendix A.5 in \cite{leiner2022data}, we have the following plug-in estimator for variance
 \[
 \hat{H}_n^{-1}\hat{V}_n\hat{H}_n^{-1} = \left( X_\mcM^\top D^2V^{-1} X_\mcM \right)^{-1}\left( X_\mcM^\top G^2 V^{-2} D^2 X_\mcM \right)\left( X_\mcM^\top D^2V^{-1} X_\mcM \right)^{-1}.
 \]
+We can then construct confidence intervals with significance level $\alpha$, for $k\in\{1,\dots,p\}$ by
+\[
+[\hbeta_n]_k \pm z_{\frac{\alpha}{2}} \sqrt{[\hat{H}_n^{-1}\hat{V}_n\hat{H}_n^{-1}]_{kk}}.
+\]
+Note now the quality of this confidence interval depends on the robustness of the working model.
 \eexa
-
-\color{red}No need to ensure $\exp(\beta^\top x_{i,\mcM})$ stays above $1$ or $\tau$, since mean already have same support?\color{black}
