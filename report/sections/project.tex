@@ -30,9 +30,10 @@ Median FCR for data splitting and data fission p1 are both well below $\alpha = 
 
 Length of CI: P2 smaller than the other two. P1 and splitting are similar. P1 and splitting similar, probably because halving data and inflated variance cancel each other out. P2 has smaller length because variance smaller and sample size doesn't change.
 
-L2 error decays by the variance of beta hat. If we marginalize $f(X)$ from P2, we'd get the same variance, hence similar L2 errors between P1 and P2. Data splitting is worse because halving data. Obvious when sample size is small, and less so when sample size is large.
+L2 error decays by the variance of beta hat. Data splitting is worse because halving data. Obvious when sample size is small, and less so when sample size is large. Similarities between P1 and P2 somewhat surprising. might need to inflate sigma2 to make things clearer? Need further investigation.
+%If we marginalize $f(X)$ from P2, we'd get the same variance, hence similar L2 errors between P1 and P2.
 
-In addition, we look at the normalized L2 error between ideal target of inference and the actual targeted parameters for data fission P2. Decays as sample size increases. This difference 
+%In addition, we look at the normalized L2 error between ideal target of inference and the actual targeted parameters for data fission P2. Decays as sample size increases. This difference 
 
 Overall, in linear regression, P1 and splitting asymptotically similar, but P1 offering better performance when sample size is small, in both selection and inference. P2 is similar to P1 at selection, but inference performance is hindered by bias. To conclude, if we know variance, and have a small sample, use data fission over splitting. P1 better than P2 because no bias. Raises questions on how to deal with this randomness in P2, as it does give a framework for extending data fission to non Gaussian data.
 
