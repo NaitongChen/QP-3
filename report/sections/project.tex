@@ -78,7 +78,7 @@ To perform variable selection, we use the \texttt{glmnet} package in \texttt{R} 
 \label{fig:median}
 \end{figure}
 
--------------------------------------------------------------------------------------------------------------------------------------
+\subsection{Discussion of simulation results}
 
 We begin by comparing variable selection accuracy. In particular we look at power and precision (give definition). Both power and precision are similar between the two data fission procedures, because they have the same $f(X)$ marginal distributions. Compared to data splitting, data fission achieves better power and precision particularly when sample size is small, although this difference wears off as sample size increases. When there are few observations, the consequence that data splitting only works with half of the observations becomes apparent. If we look at individual trials, data splitting tends to miss true features (low power) and pick instead many false features (low precision). When there is not a lot of information from the data, halving the number of observations hinders the quality of variable selection, which is to be expected. Although data fission inflates the variance of the observations (by a factor of 2), this is a worthy sacrifice when the sample size is small. As we increase the sample size, even half of the information becomes sufficient for variable selection, making the advantage of data fission less obvious.
 
@@ -89,7 +89,3 @@ Median FCR for data splitting and data fission p1 are both well below $\alpha = 
 Length of CI: P2 smaller than the other two. P1 and splitting are similar. P1 and splitting similar, probably because halving data and inflated variance cancel each other out. P2 has smaller length because variance smaller and sample size doesn't change.
 
 L2 error decays by the variance of beta hat. Data splitting is worse because halving data. Obvious when sample size is small, and less so when sample size is large. Similarities between P1 and P2 somewhat surprising. might need to inflate sigma2 to make things clearer? Need further investigation.
-
-Overall, in linear regression, P1 and splitting asymptotically similar, but P1 offering better performance when sample size is small, in both selection and inference. P2 is similar to P1 at selection, but inference performance is hindered by bias. To conclude, if we know variance, and have a small sample, use data fission over splitting. P1 better than P2 because no bias. Raises questions on how to deal with this randomness in P2, as it does give a framework for extending data fission to non Gaussian data.
-
-Worth noting that these metrics appear to be highly variable. This implies that given a single instance of data fission vs. data splitting, the performance in terms of these metrics may be pretty similar, but on average, we observe the phenomenons discussed above.
