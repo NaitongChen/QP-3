@@ -1,26 +1,84 @@
 \section{Paper-specific project}\label{sec:project}
+In this section, we compare two of the data fission procedures introduced in \cite{leiner2022data} for Gaussian distributed data against data splitting, in the context of constructing selective CIs in fixed-design linear regression models. Suppose we are given a set of $n$ observations such that for $i\in\{1,\dots,n\}$, $y_i = x_i^\top \beta + \eps_i$,
+where for some $p\in\nats$ and known $\sigma>0$, $x_i\in\reals^p$, $\eps_i\distiid \distNorm(0,\sigma^2)$, $\beta\in\reals^p$. Equivalently, we can write $Y_i\distas\distNorm(x_i^\top\beta, \sigma^2)$. Note here we assume that the covariates $x_i$'s are fixed. The goal is to first perform variable selection and then construct CIs for the regression coefficients corresponding to the selected variables. We would like to compare variable selection accuracy as well as inference quality obtained using the following three procedures:
+\begin{itemize}
+\item Data fission (P1): for each $i\in\{1,\dots,n\}$, and some fixed $\tau\in(0,\infty)$, draw $Z_i\distas\distNorm(0,\sigma^2)$. Let $f_\tau(Y_i) = Y_i + \tau Z_i$, $g_\tau(Y_i) = Y_i - \tau^{-1}Z_i$. Then $f_\tau(Y_i)\indep g_\tau(Y_i)$ and $f_\tau(Y_i)\distas\distNorm(x_i^\top\beta, (1+\tau^2)\sigma^2)$, $g_\tau(Y_i)\distNorm(x_i^\top\beta, (1+\tau^{-2})\sigma^2)$. We use $(f_\tau(Y_i))_{i=1}^n$ for selection and $(g_\tau(Y_i))_{i=1}^n$ for inference.
+\item Data fission (P2): for each $i\in\{1,\dots,n\}$, and some fixed $\tau\in(0,\infty)$, draw $Z_i\distas\distNorm(Y_i,\tau\sigma^2)$. Let $f_\tau(Y_i) = Z_i$, $g_\tau(Y_i) = Y_i$. Then $f_\tau(Y_i)\distas\distNorm(x_i^\top\beta, (1+\tau)\sigma^2)$, $g_\tau(Y_i)\given f_\tau(Y_i)\distas\distNorm\left(\frac{\tau}{\tau+1}x_i^\top\beta + \frac{1}{\tau+1}f_\tau(Y_i), \frac{\tau}{\tau+1}\sigma^2\right)$. We use $(f_\tau(Y_i))_{i=1}^n$ for selection and $(g_\tau(Y_i))_{i=1}^n$ for inference.
+\item Data splitting: for some fixed $a\in\{\frac{1}{n}, \frac{2}{n}, \dots, 1\}$, randomly draw $an$ observations from $(Y_i)_{i=1}^n$ without replacement. Without loss of generality, denote the first $an$ observations as those that are selected. Use $(Y_i)_{i=1}^{an}$ for selection and $(Y_i)_{i=an+1}^n$ for inference.
+\end{itemize}
+We begin by observing the three datasets used for the selection step. Both data fission procedures inflate the variance of each observation without changing their underlying means. Data splitting, on the other hand, directly reduces the number of observations without perturbing their underlying distributions. This also introduces uncertainty to the selection step. It is then of interest to compare variable selection accuracies under different sample sizes and the amount of variance inflated. However, recall that from the Fisher information perspective, to make the comparison fair, we set $a = \frac{1}{1+\tau^2}$. As a result, the comparison reduces to be about varying the sample sizes.
 
-%In this section we compare two data fission procesures for Gaussian random variables, one P1 and one P2, against data splitting in the context of selective CIs in fixed-design linear regression. In particular, we compare and contrast these methods at both the selection step and the inference step.
-%
-%We work under the setting of ... (specify linear regression form)
-%
-%List three fisison methods and their corresponding distributions for regression parameters.
-%
-%From the above, note that the difference comes from tau and the size of the data (which affects convergence of $(X_M^\top X_M)^{-1}$), and so for simplicity, we fix $\Sigma = \sigma^2I$ with $\sigma=1$.
-%
-%Data splitting: halving data, inflating variance (through $X^\top X$), but targets right beta star.
-%
-%Data fission p1: targets right beta star, but variance inflated by external randomness. <- infernce. selection -> inflated variance.
-%
-%Data fission p2': variance deflated, but mean now no longer targeting beta star. <- infernce. selection -> inflated variance.
-%
-%Overall, trading off the number of observations and either a) inflated variance or b) having a biased target instead of beta star. We show their consequences in a simulation study below.
-%
-%To make the comparison fair, we choose tau and a so that the Fisher information allocated to f(Y) is the same.
-%
-%As a result, we compare how these three methods perform across different dataset sizes.
-%
-%We follow procedure of paper, do variable selection using LASSO with default setting in glmnet. We run 200 trials and report the median for each metric. Plots with a measure of uncertainty are in the appendix.
+We now consider the inference stage. Suppose that the selected model is $M\subset\{1,\dots,p\}$ and that
+\[
+X_M = \begin{bmatrix} x_{M,1}, \dots, x_{M,n} \end{bmatrix}^\top, \quad Y = \begin{bmatrix} Y_1, \dots, Y_n \end{bmatrix}^\top,
+\]
+where $x_{M,i}$ is a vector consisting of only the covariates corresponding to the selected features. We then have our ideal target parameter given $M$ as
+\[
+\beta^\star(M) = \argmin_{\tilde{\beta}} \EE_Y \|Y - X_M\tilde{\beta}\|^2 = (X_M^\top X_M)^{-1}(X_M^\top\mu)
+\]
+where $\mu = \begin{bmatrix} x_1^\top\beta, \dots, x_n^\top\beta \end{bmatrix}^\top$. However, since we are using slightly perturbed datasets for inference, our estimator $\hbeta(M)$ given the model $M$ for each of the three procedures are
+\begin{itemize}
+\item Data fission (P1): $\hbeta(M) = (X_M^\top X_M)^{-1}X_M^\top g_\tau(Y) \distas \distNorm(\beta^\star(M), \sigma^2(1+\tau^{-2})(X_M^\top X_M)^{-1})$;
+\item Data fission (P2):\\ $\hbeta(M) = (X_M^\top X_M)^{-1}X_M^\top g_\tau(Y) \given f_\tau(Y) \distas \distNorm(\frac{\tau}{\tau+1}\beta^\star(M) + \frac{1}{\tau+1}(X_M^\top X_M)^{-1}X_M^\top f(Y), \sigma^2\frac{\tau}{\tau+1}(X_M^\top X_M)^{-1})$;
+\item Data splitting: $\hbeta(M) = (X_M^\top X_M)^{-1}X_M^\top Y \distas \distNorm(\beta^\star(M), \sigma^2(X_M^\top X_M)^{-1})$.
+\end{itemize}
+Note that here $f$ and $g$ are applied to each entry of $Y$ and that $X_M$ and $Y$ in data splitting only contains a subset set of $na$ observations.
+
+Looking at the means of each estimator above, both the data fission (P1) and data splitting procedures target $\beta^\star(M)$. On the other hand, the mean of the data fission (P2) estimator depends on the realized values of the external random variable $Z$. Since $\EE[f_\tau(Y)] = \mu$, if we marginalize $f_\tau(Y)$ over the distribution of $\hbeta(M)$, data fission (P2) would also target the ideal parameter $\beta^\star(M)$. However, it is reasonable to suspect that this randomness might affect the quality of inference.
+
+We now look at the variances of the three estimators. Similar to the selection stage, data fission (P1) inflates the variance of $\hbeta(M)$ by a function of $\tau$, and data splitting introduces additional uncertainty by reducing the sample size. However, in data fission (P2), the variance is deflated. Suppose for each $i$, $x_i$ is generated (\iid) by some distribution $\pi$, and assume that for all selected model $M$, $\EE[x_{M,1}x_{M,1}^\top]$ is finite and strictly positive. Then we have
+\[
+\frac{1}{n}X_M^\top X_M \convp \EE[x_{M,1}x_{M,1}^\top] \implies \left(\frac{1}{n}X_M^\top X_M\right)^{-1} \convp \left( \EE[x_{M,1}x_{M,1}^\top] \right)^{-1} \implies X_M^\top X_M \convp \frac{1}{n}\left( \EE[x_{M,1}x_{M,1}^\top] \right)^{-1}.
+\]
+Under this assumption, the difference in inference between data splitting and data fission once again comes down to the sample size and the amount of variance inflated or deflated by $\tau$. We therefore set up our simulations as following. Note that this is mostly in line with Section 4 of \cite{leiner2022data}.
+
+We set $a = \frac{1}{2}$ and $\tau=1$ to ensure the amount of Fisher information allocated to the selection stage is the same across all three methods. Let $p=20, \beta_1=\beta_{19}=1$, $\beta_2=\beta_{20}=-1$, and the rest of the entries in $\beta$ be $0$. We also generate the covariates from the standard multivariate Guassian distribution. Note that there is no intercept in our regression model. We then conduct selective inference with varying sample sizes $10, 20, 50, 100$ to evaluate how the performances across all three methods change under different sample sizes. To compare variable selection accuracy, we use as our metrics
+\[
+\text{power} = \frac{|j\in M: \beta_j \neq 0|}{|j\in [p]: \beta_j \neq 0|}, \quad \text{precision} = \frac{|j\in M: \beta_j \neq 0|}{|M|}.
+\]
+To compare the quality of inference, we look at
+\[
+\text{FCR} = \frac{|k\in M: [\beta^\star(M)]_k \notin CI_k|}{\max{|M|, 1}}, \quad \overline{\text{CI len.}} = \frac{\sum_{k\in M} |CI_k(2) - CI_k(1)|}{|M|}, \quad \text{L2 err.} = \frac{\| \beta^\star(M) - \hbeta(M) \|_2^2}{|M|}.
+\]
+To perform variable selection, we use the \texttt{glmnet} package in \texttt{R} with the default settings with the regularization parameter set to \texttt{lambda.1se}. We repeat the above experiments $200$ times and report the median of the above metrics (excluding runs that do not end up selecting any variable in the selection step) in \cref{fig:median}. The same set of plots with the IQR of each metric is included in \cref{apdx:plots}. Note that since the IQRs have a lot of overlaps, the discussion below is only concerned with the average performance rather than individual trials. The code used to run the simulations and generate the plots can be found at \url{https://github.com/NaitongChen/QP-3}.
+
+\captionsetup[subfigure]{labelformat=empty}
+\begin{figure}[ht!]
+\centering
+\begin{subfigure}[b]{.32\columnwidth} 
+    \includegraphics[width=\columnwidth]{../../plot/power_1.png}
+    \caption{(a) power}
+\end{subfigure}
+\hfill
+\centering
+\begin{subfigure}[b]{.32\columnwidth} 
+    \includegraphics[width=\columnwidth]{../../plot/precision_1.png}
+    \caption{(b) precision}
+\end{subfigure}
+\\
+\centering
+\begin{subfigure}[b]{.32\columnwidth} 
+    \includegraphics[width=\columnwidth]{../../plot/FCR_1.png}
+    \caption{(c) FCR}
+\end{subfigure}
+\hfill
+\centering
+\begin{subfigure}[b]{.32\columnwidth} 
+    \includegraphics[width=\columnwidth]{../../plot/len_1.png}
+    \caption{(d) Average CI length}
+\end{subfigure}
+\hfill
+\centering
+\begin{subfigure}[b]{.32\columnwidth} 
+    \includegraphics[width=\columnwidth]{../../plot/L2_1.png}
+    \caption{(e) L2 error}
+\end{subfigure}
+\hfill
+\caption{caption}
+\label{fig:median}
+\end{figure}
+
+-------------------------------------------------------------------------------------------------------------------------------------
 
 We begin by comparing variable selection accuracy. In particular we look at power and precision (give definition). Both power and precision are similar between the two data fission procedures, because they have the same $f(X)$ marginal distributions. Compared to data splitting, data fission achieves better power and precision particularly when sample size is small, although this difference wears off as sample size increases. When there are few observations, the consequence that data splitting only works with half of the observations becomes apparent. If we look at individual trials, data splitting tends to miss true features (low power) and pick instead many false features (low precision). When there is not a lot of information from the data, halving the number of observations hinders the quality of variable selection, which is to be expected. Although data fission inflates the variance of the observations (by a factor of 2), this is a worthy sacrifice when the sample size is small. As we increase the sample size, even half of the information becomes sufficient for variable selection, making the advantage of data fission less obvious.
 
@@ -31,68 +89,7 @@ Median FCR for data splitting and data fission p1 are both well below $\alpha = 
 Length of CI: P2 smaller than the other two. P1 and splitting are similar. P1 and splitting similar, probably because halving data and inflated variance cancel each other out. P2 has smaller length because variance smaller and sample size doesn't change.
 
 L2 error decays by the variance of beta hat. Data splitting is worse because halving data. Obvious when sample size is small, and less so when sample size is large. Similarities between P1 and P2 somewhat surprising. might need to inflate sigma2 to make things clearer? Need further investigation.
-%If we marginalize $f(X)$ from P2, we'd get the same variance, hence similar L2 errors between P1 and P2.
-
-%In addition, we look at the normalized L2 error between ideal target of inference and the actual targeted parameters for data fission P2. Decays as sample size increases. This difference 
 
 Overall, in linear regression, P1 and splitting asymptotically similar, but P1 offering better performance when sample size is small, in both selection and inference. P2 is similar to P1 at selection, but inference performance is hindered by bias. To conclude, if we know variance, and have a small sample, use data fission over splitting. P1 better than P2 because no bias. Raises questions on how to deal with this randomness in P2, as it does give a framework for extending data fission to non Gaussian data.
 
 Worth noting that these metrics appear to be highly variable. This implies that given a single instance of data fission vs. data splitting, the performance in terms of these metrics may be pretty similar, but on average, we observe the phenomenons discussed above.
-
-%I noticed that most of the experiments and simulation studies in the paper only cover cases where the distributions of $f(X)$ and $g(X)\given f(X)$ are in the same family as the original data $X$ (i.e. Gaussians or Poissons with different parameters), and there is minimal discussion on when this is not the case. I would like to therefore focus my paper-specific project on an instance of data fission where $f(X)$ follows a distribution that is not in the same family as $X$ or $g(X)\given f(X)$.\\
-%
-%The particular case that I would like to focus on is to \textbf{construct selective CIs in the fixed-design GLM model} where $Y_i \distiid \distGam(\alpha, \exp(\theta_i))$ where $\theta_i=\beta^\top x_i)$ (listed under Appendix B of \cite{leiner2022data}).
-%
-%\begin{itemize}
-%\item For each $Y_i$ with $i\in\{1,\dots,n\}$, draw $Z_i=(Z_{i1}, \dots, Z_{iB})$ where each element is \iid $Z_{ib} \distas \distPoiss(Y_i)$ with $b\in\{1,\cdots,B\}$.\\
-%Then $f(Y_i) = Z_i$, where each element is \iid $\distNB\left(\alpha, \frac{\exp(\theta_i)}{\exp(\theta_i)+B}\right)$,\\
-%$g(Y_i) \given f(Y_i)$ has conditional distribution $\distGam(\alpha+\sum_{b=1}^B [f(Y_i)]_b, \exp(\theta_i) + B)$.
-%\newline$ $
-%\color{red}
-%I believe the marginal distribution of $f(Y_i)$ is incorrect. See \cref{eg:discrete}.
-%\color{black}
-%
-%\item For each $Y_i$, draw $Z_i \distas \distPoiss(\tau Y_i)$ with $\tau\in(0,\infty)$.\\
-%Then $f(Y_i) = Z$, where each element is \iid $\distNB\left(\alpha, \frac{\theta_i}{\theta_i+\tau}\right)$,\\
-%$g(Y_i) \given f(Y_i)$ has conditional distribution $\distGam(\alpha+f(Y_i), \theta_i + \tau)$.
-%\end{itemize}
-%
-%\textbf{The proposed procesure is}
-%
-%\begin{itemize}
-%\item Decompose each $y_i$ using one of the two above procedures (assuming we are going with the second one)
-%
-%\item fit $f(y_i)$ by maximizing
-%\[
-%\sum_{i=1}^n \log \distNB\left(z_i \given \alpha, \frac{\beta^\top x_i}{\beta^\top x_i+\tau}\right) + \lambda \|\beta\|_1
-%\]
-%
-%(I've verified that this function is convex in $\beta$.)
-%
-%\item Fit a Gamma GLM model using just the selected features from the previous step
-%
-%\item Since $\distGam$ is in the exponential dispersion family, we can follow the exact same setup as in Appendix A.5 of \cite{leiner2022data} to use the QMLE procedure to construct CIs in the inference step.
-%\newline$ $
-%\color{red}
-%This function may be convex but without an argmin, or non-convex, depending on the values of $y, z$, and $\alpha$. See \cref{eg:gam_discrete,eg:gam_cont}. This is already an undesirable quality of data fission.
-%\color{black}
-%
-%\end{itemize}
-%
-%\textbf{Key areas that I would like to explore (through simulations)}
-%\begin{itemize}
-%\item compare the variables selected using decomposed data following geometric distribution against those using data splitting and the (invalid) approach of using the same dataset twice for both selection and inference. The setup that I have is mostly inline with the simulation studies in Sections 4 and 5 in \cite{leiner2022data}, however, I would like to ensure there is no influential point and all assumptions are met. This way we can better isolate the effect of transforming the original dataset to something that follows a different distribution.
-%\item compare the two data fission procedures laid out above with discrete and continous tuning parameters ($B$ and $\tau$) for deciding how much information is split between $f(Y)$ and $g(Y)\given f(Y)$. The second version seems like a continuous relaxation (under expectation) of the first data fission method. However, in the case with a discrete tuning parameter, the dimension of $f(Y_i)$ changes and we need to somehow account for that in the selection step. This is not addressed directly in the paper, but I think a natural way to deal with this is to think of stacking the elements of $f(Y_i)$ so that for each particular set of covariates $x_i$, we have multiple corresponding responses instead of $1$. I would like to explore the connection between these two fission processes (probably empirically) in terms of the amount of information allocated in each component of the fissioned data. The same simulation setup from the previous bullet point can be used here.
-%\newline $ $
-%\color{red} 
-%I believe this is no longer necessary because the result generalizing to $B>1$ does not hold?
-%\color{black}
-%\end{itemize}
-%\textbf{Revised plan}
-%\newline $ $
-%We investigate to what extent would we like the distributions of $X, f(X), g(X)\given f(X)$ be similar to each other, in terms of parametric family and whether the parameters are random. For all of these comparisons, pick the tuning parameter so information allocated to $f(X)$ is the same compared to the counterpart in data splitting (ideally half).
-%\begin{itemize}
-%\item compare the first two versions of data fission for Gaussian linear regression against data splitting. All three parts follow Gaussian distributions, but one version has the value of $Z$ being a parameter for the distribution of $g(X)\given f(X)$, while the other does not. This can help us study the effect of having the parameter of the distribution of $g(X)\given f(X)$ depending on $Z$. My hypothesis is that there will be higher variability on the width of the CIs.
-%\item compare the two versions of data fission for Possion regression against data splitting. One version has all of $X, f(X), g(X)\given f(X)$ following Possion distributions, the other version has $g(X)\given f(X)$ following a binomial distribution and the others following Possion distributions. With this we can check the effect of not having the same parametric family of distributions. Use large enough samples with we are closer to asymptotic normality. But this effect may be confounded by the fact that the Binomial version has $Z$ in the parameter while the other does not.
-%\item both of the previous examples check the effect on the inference step. The Gamma example on the previous page has $f(X)$ following a different distribution. We can use this to study the effect of disimilarity between $f(X)$ and $X$ on variable selection. But the corresponding MLE for the subsequent inference step is hard to optimize. If we use a working model, we can also then compare the inferential results against data splitting.
-%\end{itemize}
