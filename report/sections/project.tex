@@ -1,26 +1,26 @@
 \section{Paper-specific project}\label{sec:project}
 
-In this section we compare two data fission procesures for Gaussian random variables, one P1 and one P2, against data splitting in the context of selective CIs in fixed-design linear regression. In particular, we compare and contrast these methods at both the selection step and the inference step.
-
-We work under the setting of ... (specify linear regression form)
-
-List three fisison methods and their corresponding distributions for regression parameters.
-
-From the above, note that the difference comes from tau and the size of the data (which affects convergence of $(X_M^\top X_M)^{-1}$), and so for simplicity, we fix $\Sigma = \sigma^2I$ with $\sigma=1$.
-
-Data splitting: halving data, inflating variance (through $X^\top X$), but targets right beta star.
-
-Data fission p1: targets right beta star, but variance inflated by external randomness. <- infernce. selection -> inflated variance.
-
-Data fission p2': variance deflated, but mean now no longer targeting beta star. <- infernce. selection -> inflated variance.
-
-Overall, trading off the number of observations and either a) inflated variance or b) having a biased target instead of beta star. We show their consequences in a simulation study below.
-
-To make the comparison fair, we choose tau and a so that the Fisher information allocated to f(Y) is the same.
-
-As a result, we compare how these three methods perform across different dataset sizes.
-
-We follow procedure of paper, do variable selection using LASSO with default setting in glmnet. We run 200 trials and report the median for each metric. Plots with a measure of uncertainty are in the appendix.
+%In this section we compare two data fission procesures for Gaussian random variables, one P1 and one P2, against data splitting in the context of selective CIs in fixed-design linear regression. In particular, we compare and contrast these methods at both the selection step and the inference step.
+%
+%We work under the setting of ... (specify linear regression form)
+%
+%List three fisison methods and their corresponding distributions for regression parameters.
+%
+%From the above, note that the difference comes from tau and the size of the data (which affects convergence of $(X_M^\top X_M)^{-1}$), and so for simplicity, we fix $\Sigma = \sigma^2I$ with $\sigma=1$.
+%
+%Data splitting: halving data, inflating variance (through $X^\top X$), but targets right beta star.
+%
+%Data fission p1: targets right beta star, but variance inflated by external randomness. <- infernce. selection -> inflated variance.
+%
+%Data fission p2': variance deflated, but mean now no longer targeting beta star. <- infernce. selection -> inflated variance.
+%
+%Overall, trading off the number of observations and either a) inflated variance or b) having a biased target instead of beta star. We show their consequences in a simulation study below.
+%
+%To make the comparison fair, we choose tau and a so that the Fisher information allocated to f(Y) is the same.
+%
+%As a result, we compare how these three methods perform across different dataset sizes.
+%
+%We follow procedure of paper, do variable selection using LASSO with default setting in glmnet. We run 200 trials and report the median for each metric. Plots with a measure of uncertainty are in the appendix.
 
 We begin by comparing variable selection accuracy. In particular we look at power and precision (give definition). Both power and precision are similar between the two data fission procedures, because they have the same $f(X)$ marginal distributions. Compared to data splitting, data fission achieves better power and precision particularly when sample size is small, although this difference wears off as sample size increases. When there are few observations, the consequence that data splitting only works with half of the observations becomes apparent. If we look at individual trials, data splitting tends to miss true features (low power) and pick instead many false features (low precision). When there is not a lot of information from the data, halving the number of observations hinders the quality of variable selection, which is to be expected. Although data fission inflates the variance of the observations (by a factor of 2), this is a worthy sacrifice when the sample size is small. As we increase the sample size, even half of the information becomes sufficient for variable selection, making the advantage of data fission less obvious.
 
