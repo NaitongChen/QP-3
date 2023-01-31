@@ -177,18 +177,22 @@ plot_single_trial <- function(trial, method, n, sigma_y, beta, signal,
   colors = c()
   for (i in 1:length(selected)) {
     if (CIs[i,1] <= df_selected$beta[i] & CIs[i,2] >= df_selected$beta[i]) {
-      colors = c(colors, "blue") 
+      colors = c(colors, "#9999CC") 
     } else {
-      colors = c(colors, "red") 
+      colors = c(colors, "#CC6666") 
     }
   }
   
   print(ggplot(df_selected, aes(index, beta)) +
-    geom_point(shape=4, size=4, color="blue") +
+          theme(axis.text.x = element_text(size=25),
+                axis.text.y = element_text(size=25),
+                axis.title.x = element_blank(),
+                axis.title.y = element_blank()) +
+    geom_point(shape=4, size=10, color="#9999CC") +
     geom_errorbar(aes(ymin = lowers, ymax = uppers), color=colors) +
     geom_point(aes(index, beta_hats), color=colors) +
     geom_point(aes(index, beta), df) +
-    geom_point(aes(index, target_beta), shape=9, size=9, color="orange"))
+    geom_point(aes(index, target_beta), shape=9, size=10, color="#66CC99"))
 
   ggsave(paste0("../plot/", method, "_", as.character(n), "_", 
                 as.character(sigma_y), "_", as.character(trial), ".png"))
