@@ -204,5 +204,130 @@ We can then construct confidence intervals with significance level $\alpha$, for
 \]
 Note now the quality of this confidence interval depends on the robustness of the working model.
 \eexa
-\section{Additional plots}\label{apdx:plots}
-blah
+
+\section{Additional simulation details}\label{apdx:plots}
+\begin{table}[H]
+\centering
+\caption{Number of runs that do not select any variable}
+\label{tab:num_none}
+\begin{tabular}{ccccc}
+                  & n=10  & n=20 & n=50 & n=100 \\
+                  \hline\\
+Data splitting    & 103 & 60 & 1  & 0   \\
+Data fission (P1) & 72  & 49 & 0  & 0   \\
+Data fission (P2) & 66  & 41 & 0  & 0  
+\end{tabular}
+\end{table}
+
+\captionsetup[subfigure]{labelformat=empty}
+\begin{figure}[ht!]
+\centering
+\begin{subfigure}[b]{.40\columnwidth} 
+    \includegraphics[width=\columnwidth]{../../plot/power_1_IQR.png}
+    \caption{(a) Power}
+\end{subfigure}
+\hfill
+\centering
+\begin{subfigure}[b]{.40\columnwidth} 
+    \includegraphics[width=\columnwidth]{../../plot/precision_1_IQR.png}
+    \caption{(b) Precision}
+\end{subfigure}
+\\
+\centering
+\begin{subfigure}[b]{.40\columnwidth} 
+    \includegraphics[width=\columnwidth]{../../plot/FCR_1_IQR.png}
+    \caption{(c) FCR}
+\end{subfigure}
+\hfill
+\centering
+\begin{subfigure}[b]{.40\columnwidth} 
+    \includegraphics[width=\columnwidth]{../../plot/len_1_IQR.png}
+    \caption{(d) Average CI length}
+\end{subfigure}
+\\
+\centering
+\begin{subfigure}[b]{.40\columnwidth} 
+    \includegraphics[width=\columnwidth]{../../plot/L2_1_IQR.png}
+    \caption{(e) L2 error}
+\end{subfigure}
+\hfill
+\caption{caption}
+\label{fig:IQR}
+\end{figure}
+
+\captionsetup[subfigure]{labelformat=empty}
+\begin{figure}[ht!]
+\centering
+\begin{subfigure}[b]{.32\columnwidth} 
+    \includegraphics[width=\columnwidth]{../../plot/split_10_1_1.png}
+    \caption{(a) Power}
+\end{subfigure}
+\hfill
+\centering
+\begin{subfigure}[b]{.32\columnwidth} 
+    \includegraphics[width=\columnwidth]{../../plot/p1_10_1_1.png}
+    \caption{(b) Precision}
+\end{subfigure}
+\hfill
+\centering
+\begin{subfigure}[b]{.32\columnwidth} 
+    \includegraphics[width=\columnwidth]{../../plot/p2_10_1_1.png}
+    \caption{(c) FCR}
+\end{subfigure}
+\\
+\centering
+\begin{subfigure}[b]{.32\columnwidth} 
+    \includegraphics[width=\columnwidth]{../../plot/split_20_1_1.png}
+    \caption{(d) Average CI length}
+\end{subfigure}
+\hfill
+\centering
+\begin{subfigure}[b]{.32\columnwidth} 
+    \includegraphics[width=\columnwidth]{../../plot/p1_20_1_1.png}
+    \caption{(e) L2 error}
+\end{subfigure}
+\hfill
+\centering
+\begin{subfigure}[b]{.32\columnwidth} 
+    \includegraphics[width=\columnwidth]{../../plot/p2_20_1_1.png}
+    \caption{(f) L2 error}
+\end{subfigure}
+\\
+\centering
+\begin{subfigure}[b]{.32\columnwidth} 
+    \includegraphics[width=\columnwidth]{../../plot/split_50_1_1.png}
+    \caption{(g) Average CI length}
+\end{subfigure}
+\hfill
+\centering
+\begin{subfigure}[b]{.32\columnwidth} 
+    \includegraphics[width=\columnwidth]{../../plot/p1_50_1_1.png}
+    \caption{(h) L2 error}
+\end{subfigure}
+\hfill
+\centering
+\begin{subfigure}[b]{.32\columnwidth} 
+    \includegraphics[width=\columnwidth]{../../plot/p2_50_1_1.png}
+    \caption{(i) L2 error}
+\end{subfigure}
+\\
+\centering
+\begin{subfigure}[b]{.32\columnwidth} 
+    \includegraphics[width=\columnwidth]{../../plot/split_100_1_1.png}
+    \caption{(j) Average CI length}
+\end{subfigure}
+\hfill
+\centering
+\begin{subfigure}[b]{.32\columnwidth} 
+    \includegraphics[width=\columnwidth]{../../plot/p1_100_1_1.png}
+    \caption{(k) L2 error}
+\end{subfigure}
+\hfill
+\centering
+\begin{subfigure}[b]{.32\columnwidth} 
+    \includegraphics[width=\columnwidth]{../../plot/p2_100_1_1.png}
+    \caption{(l) L2 error}
+\end{subfigure}
+\caption{caption}
+\label{fig:individual}
+\end{figure}

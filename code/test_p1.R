@@ -21,7 +21,7 @@ metrics = c("power", "precision", "len", "FCR", "L2")
 tau = 1
 
 sigma_y = 1
-n = 20
+n = 50
 
 set.seed(runif(1, 1, 1000))
 dat = generate_data(n, p, beta, signal, mu_x, sigma_x, sigma_y)

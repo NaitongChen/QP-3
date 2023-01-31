@@ -293,13 +293,13 @@ plot_metric <- function(trial, ns, sigma_y, metric, dat1, dat2, dat3) {
                    axis.title.y = element_blank(),
                    legend.title = element_blank()) +
     geom_point(aes(size, medians, color="DS"), df1, size=6) + geom_line(aes(size, medians, color="DS"), df1, size=3) +
-    geom_errorbar(aes(x = df1$size, ymin = df1$first_q, ymax = df1$third_q, color="DS"), size=3) +
+    # geom_errorbar(aes(x = df1$size, ymin = df1$first_q, ymax = df1$third_q, color="DS"), size=3) +
     geom_point(aes(size, medians, color="DF1"), df2, size=4) + geom_line(aes(size, medians, color="DF1"), df2, size=2) +
-    geom_errorbar(aes(x = df2$size, ymin = df2$first_q, ymax = df2$third_q, color="DF1"), size=2) +
+    # geom_errorbar(aes(x = df2$size, ymin = df2$first_q, ymax = df2$third_q, color="DF1"), size=2) +
     geom_point(aes(size, medians, color="DF2"), df3, size=2) + geom_line(aes(size, medians, color="DF2"), df3, size=1) +
-    geom_errorbar(aes(x = df3$size, ymin = df3$first_q, ymax = df3$third_q, color="DF2"), size=1) +
+    # geom_errorbar(aes(x = df3$size, ymin = df3$first_q, ymax = df3$third_q, color="DF2"), size=1) +
     labs(color = "Legend") +
-    scale_color_manual(values = colors) + ylim(0.0, 2.5)
+    scale_color_manual(values = colors) + ylim(0.0, 3.5)
     
   
   ggsave(paste0("../plot/", metric, "_", 

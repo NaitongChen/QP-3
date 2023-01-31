@@ -21,7 +21,7 @@ metrics = c("power", "precision", "len", "FCR", "L2")
 tau = 1
 
 sigma_y = 1
-n = 200
+n = 100
 
 set.seed(runif(1, 1, 1000))
 dat = generate_data(n, p, beta, signal, mu_x, sigma_x, sigma_y)
@@ -41,7 +41,7 @@ if (length(selected) > 0) {
   beta_hat = dat[[1]]
   CIs = dat[[2]]
   
-  plot_single_trial(1, methods[2], n, sigma_y, beta, signal,
+  plot_single_trial(1, methods[3], n, sigma_y, beta, signal,
                     selected, beta_hat, CIs, true_mu, X2)
   
   dat = metric_single_trial(beta, signal, selected, 
