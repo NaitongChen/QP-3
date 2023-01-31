@@ -284,19 +284,23 @@ plot_metric <- function(trial, ns, sigma_y, metric, dat1, dat2, dat3) {
   
   df3 = data.frame(size, medians, first_q, third_q)
   
-  colors <- c("DS" = "orange", "DF1" = "blue", "DF2" = "green")
+  colors <- c("DS" = "#66CC99", "DF1" = "#9999CC", "DF2" = "#CC6666")
   
-  ggplot() +
-    geom_point(aes(size, medians), df1, color="red") + geom_line(aes(size, medians, color="DS"), df1, size=3) +
-    # geom_errorbar(aes(x = df1$size, ymin = df1$first_q, ymax = df1$third_q, color="DS"), size=3) +
-    geom_point(aes(size, medians), df2, color="blue") + geom_line(aes(size, medians, color="DF1"), df2, size=2) +
-    # geom_errorbar(aes(x = df2$size, ymin = df2$first_q, ymax = df2$third_q, color="DF1"), size=2) +
-    geom_point(aes(size, medians), df3, color="green") + geom_line(aes(size, medians, color="DF2"), df3, size=1) +
-    # geom_errorbar(aes(x = df3$size, ymin = df3$first_q, ymax = df3$third_q, color="DF2"), size=1) +
-    labs(x = "sample size",
-         y = metric,
-         color = "Legend") +
-    scale_color_manual(values = colors)
+  ggplot() + theme(legend.text = element_text(size=25),
+                   axis.text.x = element_text(size=25),
+                   axis.text.y = element_text(size=25),
+                   axis.title.x = element_blank(),
+                   axis.title.y = element_blank(),
+                   legend.title = element_blank()) +
+    geom_point(aes(size, medians, color="DS"), df1, size=6) + geom_line(aes(size, medians, color="DS"), df1, size=3) +
+    geom_errorbar(aes(x = df1$size, ymin = df1$first_q, ymax = df1$third_q, color="DS"), size=3) +
+    geom_point(aes(size, medians, color="DF1"), df2, size=4) + geom_line(aes(size, medians, color="DF1"), df2, size=2) +
+    geom_errorbar(aes(x = df2$size, ymin = df2$first_q, ymax = df2$third_q, color="DF1"), size=2) +
+    geom_point(aes(size, medians, color="DF2"), df3, size=2) + geom_line(aes(size, medians, color="DF2"), df3, size=1) +
+    geom_errorbar(aes(x = df3$size, ymin = df3$first_q, ymax = df3$third_q, color="DF2"), size=1) +
+    labs(color = "Legend") +
+    scale_color_manual(values = colors) + ylim(0.0, 2.5)
+    
   
   ggsave(paste0("../plot/", metric, "_", 
                 as.character(sigma_y), ".png"))
