@@ -208,7 +208,7 @@ Note now the quality of this confidence interval depends on the robustness of th
 \section{Additional simulation details}\label{apdx:plots}
 \begin{table}[H]
 \centering
-\caption{Number of runs that do not select any variable}
+\caption{Number of runs (out of $200$) that do not select any variable.}
 \label{tab:num_none}
 \begin{tabular}{ccccc}
                   & n=10  & n=20 & n=50 & n=100 \\
@@ -251,85 +251,85 @@ Data fission (P2) & 66  & 41 & 0  & 0
     \caption{(e) L2 error}
 \end{subfigure}
 \hfill
-\caption{refer to table to explain large IQR when sample size small}
+\caption{Median and corresponding IQR of each metric across $200$ runs. The x-axis shows sample size, and the y-axis shows the value of each metric. DS refers to data splitting, DF1 and DF2 refer to data fission (P1) and data fission (P2). The high IQRs for when sample size is small is likely due to many runs not selecting any variable (\cref{tab:num_none}), all of which we excluded from the calculation.}
 \label{fig:IQR}
 \end{figure}
 
 \captionsetup[subfigure]{labelformat=empty}
 \begin{figure}[ht!]
 \centering
-\begin{subfigure}[b]{.32\columnwidth} 
+\begin{subfigure}[b]{.30\columnwidth} 
     \includegraphics[width=\columnwidth]{../../plot/split_10_1_1.png}
-    \caption{(a) Data splitting $n=10$}
+    \caption{(a) Data splitting, $n=10$}
     \label{fig:split10}
 \end{subfigure}
 \hfill
 \centering
-\begin{subfigure}[b]{.32\columnwidth} 
+\begin{subfigure}[b]{.30\columnwidth} 
     \includegraphics[width=\columnwidth]{../../plot/p1_10_1_1.png}
-    \caption{(b) Data fission (P1) $n=10$}
+    \caption{(b) Data fission (P1), $n=10$}
 \end{subfigure}
 \hfill
 \centering
-\begin{subfigure}[b]{.32\columnwidth} 
+\begin{subfigure}[b]{.30\columnwidth} 
     \includegraphics[width=\columnwidth]{../../plot/p2_10_1_1.png}
-    \caption{(c) Data fission (P2) $n=10$}
+    \caption{(c) Data fission (P2), $n=10$}
 \end{subfigure}
 \\
 \centering
-\begin{subfigure}[b]{.32\columnwidth} 
+\begin{subfigure}[b]{.30\columnwidth} 
     \includegraphics[width=\columnwidth]{../../plot/split_20_1_1.png}
-    \caption{(d) Data splitting $n=20$}
+    \caption{(d) Data splitting, $n=20$}
 \end{subfigure}
 \hfill
 \centering
-\begin{subfigure}[b]{.32\columnwidth} 
+\begin{subfigure}[b]{.30\columnwidth} 
     \includegraphics[width=\columnwidth]{../../plot/p1_20_1_1.png}
-    \caption{(e) Data fission (P1) $n=20$}
+    \caption{(e) Data fission (P1), $n=20$}
 \end{subfigure}
 \hfill
 \centering
-\begin{subfigure}[b]{.32\columnwidth} 
+\begin{subfigure}[b]{.30\columnwidth} 
     \includegraphics[width=\columnwidth]{../../plot/p2_20_1_1.png}
-    \caption{(f) Data fission (P2) $n=20$}
+    \caption{(f) Data fission (P2), $n=20$}
 \end{subfigure}
 \\
 \centering
-\begin{subfigure}[b]{.32\columnwidth} 
+\begin{subfigure}[b]{.30\columnwidth} 
     \includegraphics[width=\columnwidth]{../../plot/split_50_1_1.png}
-    \caption{(g) Data splitting $n=50$}
+    \caption{(g) Data splitting, $n=50$}
 \end{subfigure}
 \hfill
 \centering
-\begin{subfigure}[b]{.32\columnwidth} 
+\begin{subfigure}[b]{.30\columnwidth} 
     \includegraphics[width=\columnwidth]{../../plot/p1_50_1_1.png}
-    \caption{(h) Data fission (P1) $n=50$}
+    \caption{(h) Data fission (P1), $n=50$}
 \end{subfigure}
 \hfill
 \centering
-\begin{subfigure}[b]{.32\columnwidth} 
+\begin{subfigure}[b]{.30\columnwidth} 
     \includegraphics[width=\columnwidth]{../../plot/p2_50_1_1.png}
-    \caption{(i) Data fission (P2) $n=50$}
+    \caption{(i) Data fission (P2), $n=50$}
 \end{subfigure}
 \\
 \centering
-\begin{subfigure}[b]{.32\columnwidth} 
+\begin{subfigure}[b]{.30\columnwidth} 
     \includegraphics[width=\columnwidth]{../../plot/split_100_1_1.png}
-    \caption{(j) Data splitting $n=100$}
+    \caption{(j) Data splitting, $n=100$}
 \end{subfigure}
 \hfill
 \centering
-\begin{subfigure}[b]{.32\columnwidth} 
+\begin{subfigure}[b]{.30\columnwidth} 
     \includegraphics[width=\columnwidth]{../../plot/p1_100_1_1.png}
-    \caption{(k) Data fission (P1) $n=100$}
+    \caption{(k) Data fission (P1), $n=100$}
 \end{subfigure}
 \hfill
 \centering
-\begin{subfigure}[b]{.32\columnwidth} 
+\begin{subfigure}[b]{.30\columnwidth} 
     \includegraphics[width=\columnwidth]{../../plot/p2_100_1_1.png}
-    \caption{(l) Data fission (P2) $n=100$}
+    \caption{(l) Data fission (P2), $n=100$}
     \label{fig:p2_100}
 \end{subfigure}
-\caption{introduce legend and what coverage color means}
+\caption{An instance of the selected variables (lavender crosses) and the corresponding CIs for each experiment setting. The green diamonds indicate the targeted parameters ($\beta^\star(M)$), and the black dots indicate the true $\beta$ values. CIs are drawn in red if they fail to cover $\beta^\star(M)$. The x-axis shows the index of the estimated $\beta$ vector, and the y-axis shows the value of the estimate.}
 \label{fig:individual}
 \end{figure}
