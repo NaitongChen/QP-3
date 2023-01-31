@@ -303,7 +303,7 @@ plot_metric <- function(trial, ns, sigma_y, metric, dat1, dat2, dat3) {
     geom_point(aes(size, medians, color="DF2"), df3, size=2) + geom_line(aes(size, medians, color="DF2"), df3, size=1) +
     # geom_errorbar(aes(x = df3$size, ymin = df3$first_q, ymax = df3$third_q, color="DF2"), size=1) +
     labs(color = "Legend") +
-    scale_color_manual(values = colors) + ylim(0.0, 3.5)
+    scale_color_manual(values = colors) + ylim(0.0, 2.5)
     
   
   ggsave(paste0("../plot/", metric, "_", 
@@ -327,32 +327,4 @@ compute_l2 <- function(tau, beta, signal, selected,
   
   # return((1/length(selected)) * norm(target_beta - true_mean, type="2")^2)
   return(norm(target_beta - true_mean, type="2") / norm(target_beta, type="2"))
-}
-
-plot_l2 <- function(ns, sigma_y, metric, dat) {
-  n_size = length(ns)
-  size = ns
-  medians = rep(0, n_size)
-  first_q = rep(0, n_size)
-  third_q = rep(0, n_size)
-  for (i in 1:n_size) {
-    medians[i] = median(dat[[i]])
-    first_q[i] = quantile(dat[[i]], 0.25)
-    third_q[i] = quantile(dat[[i]], 0.75)
-  }
-  
-  df = data.frame(size, medians, first_q, third_q)
-  
-  colors <- c("DF2" = "green")
-  
-  ggplot() +
-    geom_point(aes(size, medians), df, color="green") + geom_line(aes(size, medians, color="DF2"), df, size=1) +
-    # geom_errorbar(aes(x = df$size, ymin = df$first_q, ymax = df$third_q, color="DF2"), size=1) +
-    labs(x = "sample size",
-         y = metric,
-         color = "Legend") +
-    scale_color_manual(values = colors)
-  
-  ggsave(paste0("../plot/", metric, "_", 
-                as.character(sigma_y), ".png"))
 }

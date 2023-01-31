@@ -19,7 +19,7 @@ where $x_{M,i}$ is a vector consisting of only the covariates corresponding to t
 where $\mu = \begin{bmatrix} x_1^\top\beta, \dots, x_n^\top\beta \end{bmatrix}^\top$. However, since we are using slightly perturbed datasets for inference, our estimator $\hbeta(M)$ given the model $M$ for each of the three procedures are
 \begin{itemize}
 \item Data fission (P1): $\hbeta(M) = (X_M^\top X_M)^{-1}X_M^\top g_\tau(Y) \distas \distNorm(\beta^\star(M), \sigma^2(1+\tau^{-2})(X_M^\top X_M)^{-1})$;
-\item Data fission (P2):\\ $\hbeta(M) = (X_M^\top X_M)^{-1}X_M^\top g_\tau(Y) \given f_\tau(Y) \distas \distNorm(\frac{\tau}{\tau+1}\beta^\star(M) + \frac{1}{\tau+1}(X_M^\top X_M)^{-1}X_M^\top f(Y), \sigma^2\frac{\tau}{\tau+1}(X_M^\top X_M)^{-1})$;
+\item Data fission (P2):\\ $\hbeta(M) = (X_M^\top X_M)^{-1}X_M^\top g_\tau(Y) \given f_\tau(Y) \distas \distNorm(\frac{\tau}{\tau+1}\beta^\star(M) + \frac{1}{\tau+1}(X_M^\top X_M)^{-1}X_M^\top f_\tau(Y), \sigma^2\frac{\tau}{\tau+1}(X_M^\top X_M)^{-1})$;
 \item Data splitting: $\hbeta(M) = (X_M^\top X_M)^{-1}X_M^\top Y \distas \distNorm(\beta^\star(M), \sigma^2(X_M^\top X_M)^{-1})$.
 \end{itemize}
 Note that here $f$ and $g$ are applied to each entry of $Y$ and that $X_M$ and $Y$ in data splitting only contains a subset set of $na$ observations.
@@ -36,42 +36,47 @@ We set $a = \frac{1}{2}$ and $\tau=1$ to ensure the amount of Fisher information
 \[
 \text{power} = \frac{|j\in M: \beta_j \neq 0|}{|j\in [p]: \beta_j \neq 0|}, \quad \text{precision} = \frac{|j\in M: \beta_j \neq 0|}{|M|}.
 \]
-To compare the quality of inference, we look at
+To compare the quality of inference, we use false coverage rate (FCR), avg. CI length, and avg. L2 error:
 \[
-\text{FCR} = \frac{|k\in M: [\beta^\star(M)]_k \notin CI_k|}{\max{|M|, 1}}, \quad \overline{\text{CI len.}} = \frac{\sum_{k\in M} |CI_k(2) - CI_k(1)|}{|M|}, \quad \text{L2 err.} = \frac{\| \beta^\star(M) - \hbeta(M) \|_2^2}{|M|}.
+\text{FCR} = \frac{|k\in M: [\beta^\star(M)]_k \notin CI_k|}{\max\{|M|, 1\}}, \quad \overline{\text{CI len.}} = \frac{\sum_{k\in M} |\text{CI}_k(2) - \text{CI}_k(1)|}{|M|}, \quad \text{L2 err.} = \frac{\| \beta^\star(M) - \hbeta(M) \|_2^2}{|M|}.
 \]
-To perform variable selection, we run LASSO using the \texttt{glmnet} package in \texttt{R} with the default settings and the regularization parameter set to \texttt{lambda.1se}. We repeat the above experiments $200$ times and report the median of the above metrics (excluding runs that do not end up selecting any variable in the selection step) in \cref{fig:median}. The same set of plots with the IQR of each metric is included in \cref{apdx:plots}. Note that since the IQRs have a lot of overlaps, the discussion below is only concerned with the average performance rather than individual trials. The code used to run the simulations and generate the plots can be found at \url{https://github.com/NaitongChen/QP-3}.
+To perform variable selection, we run LASSO using the \texttt{glmnet} package in \texttt{R} with the default settings and the regularization parameter set to \texttt{lambda.1se}. We repeat the above experiments $200$ times and report the median of the above metrics (excluding runs that do not end up selecting any variable in the selection step) in \cref{fig:median}. The same set of plots with the IQR of each metric, along with other details of the experiment is included in \cref{apdx:plots}. Note that since the IQRs have a lot of overlaps, the discussion below is only concerned with the average performance rather than individual trials. The code used to run the simulations and generate the plots can be found at \url{https://github.com/NaitongChen/QP-3}.
 
 \captionsetup[subfigure]{labelformat=empty}
 \begin{figure}[ht!]
 \centering
 \begin{subfigure}[b]{.32\columnwidth} 
-    \includegraphics[width=\columnwidth]{../../plot/power_1_med.png}
+    \includegraphics[width=\columnwidth]{../../plot/power_1.png}
     \caption{(a) Power}
+    \label{fig:power}
 \end{subfigure}
 \hfill
 \centering
 \begin{subfigure}[b]{.32\columnwidth} 
-    \includegraphics[width=\columnwidth]{../../plot/precision_1_med.png}
+    \includegraphics[width=\columnwidth]{../../plot/precision_1.png}
     \caption{(b) Precision}
+    \label{fig:precision}
 \end{subfigure}
 \\
 \centering
 \begin{subfigure}[b]{.32\columnwidth} 
-    \includegraphics[width=\columnwidth]{../../plot/FCR_1_med.png}
+    \includegraphics[width=\columnwidth]{../../plot/FCR_1.png}
     \caption{(c) FCR}
+    \label{fig:fcr}
 \end{subfigure}
 \hfill
 \centering
 \begin{subfigure}[b]{.32\columnwidth} 
-    \includegraphics[width=\columnwidth]{../../plot/len_1_med.png}
+    \includegraphics[width=\columnwidth]{../../plot/len_1.png}
     \caption{(d) Average CI length}
+    \label{fig:ci}
 \end{subfigure}
 \hfill
 \centering
 \begin{subfigure}[b]{.32\columnwidth} 
-    \includegraphics[width=\columnwidth]{../../plot/L2_1_med.png}
+    \includegraphics[width=\columnwidth]{../../plot/L2_1.png}
     \caption{(e) L2 error}
+    \label{fig:l2}
 \end{subfigure}
 \hfill
 \caption{caption}
@@ -80,12 +85,12 @@ To perform variable selection, we run LASSO using the \texttt{glmnet} package in
 
 \subsection{Discussion of simulation results}
 
-We begin by comparing variable selection accuracy. In particular we look at power and precision (give definition). Both power and precision are similar between the two data fission procedures, because they have the same $f_\tau(X)$ marginal distributions. Compared to data splitting, data fission achieves better power and precision particularly when sample size is small, although this difference wears off as sample size increases. When there are few observations, the consequence that data splitting only works with half of the observations becomes apparent. If we look at individual trials, data splitting tends to miss true features (low power) and pick instead many false features (low precision). When there is not a lot of information from the data, halving the number of observations hinders the quality of variable selection, which is to be expected. Although data fission inflates the variance of the observations (by a factor of 2), this is a worthy sacrifice when the sample size is small. As we increase the sample size, even half of the information becomes sufficient for variable selection, making the advantage of data fission less obvious.
+We begin by comparing variable selection accuracy through power and precision (\cref{fig:power,fig:precision}). Both metrics are similar across different sample sizes between the two data fission procedures, because they have the same $f_\tau(Y)$ marginal distributions with $\tau=1$. Compared to data splitting, data fission achieves higher power and precision, particularly when sample size is small. When there are few observations, the disadvantage of data splitting working with only half of the observations becomes apparent. In particular, if we look at individual trials (\cref{fig:split10}), data splitting tends to miss true features and pick instead many false features, leading to suboptimal power and precision. This is to be expected, as when there is not a lot of information from the data, halving the number of observations would likely hinder the quality of variable selection. Although data fission inflates the variance of the observations by a factor of two, this seems to be a worthy price to pay in order to not reduce the number of observations used in the selection stage. As we increase the sample size, however, even half of the information becomes sufficient for variable selection, which makes the advantage of data fission less obvious.
 
-We now look at the quality of inference. Here we look at false coverage rate (FCR), length of CIs, and the L2 error between the estimated parameter and the ideal target of inference.
-
-Median FCR for data splitting and data fission p1 are both well below $\alpha = 0.05$ (No correction needed, cite data fission paper). On the other hand, data fission p2 has a much higher FCR. This is because P2 not targeting the right beta star. In addition, having the CI se decrease does not help. Higher FCR could be that $(X^\top X)^{-1}$ converges, but randomness in $f(y)$ does not change. Worth noting that having low FCR does not necessarily mean we recover the true parameters, because there is a discrepancy between true and targeted beta's, especially when sample size is small.
+We now look at the quality of inference through FCR, avg. CI length, as well as the L2 error between the estimated parameter and the ideal target of inference averaged by the number of variables selected. \cref{fig:fcr} shows that the median FCR for data splitting and data fission (P1) are both well below the target level $\alpha = 0.05$ using standard unadjusted $95\%$ CIs. Note that no correction is needed here since the proportion of CIs covering their respective parameters is expected to be $0.95$ \citep{benjamini2005false}. On the other hand, data fission (P2) has a much higher FCR. This is due to the mean of $\hbeta(M)$ being different than $\beta^\star(M)$ and its variance being further deflated by the fission procedure. Higher FCR could be that $(X^\top X)^{-1}$ converges, but randomness in $f(y)$ does not change. Worth noting that having low FCR does not necessarily mean we recover the true parameters, because there is a discrepancy between true and targeted beta's, especially when sample size is small.
 
 Length of CI: P2 smaller than the other two. P1 and splitting are similar. P1 and splitting similar, probably because halving data and inflated variance cancel each other out. P2 has smaller length because variance smaller and sample size doesn't change.
 
 L2 error decays by the variance of beta hat. Data splitting is worse because halving data. Obvious when sample size is small, and less so when sample size is large. Similarities between P1 and P2 somewhat surprising. might need to inflate sigma2 to make things clearer? Need further investigation.
+
+Finally we refer the reader to Fig 3. Talk about general trend
